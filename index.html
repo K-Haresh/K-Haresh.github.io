@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Haresh Kothandaraman: Data Science MS at UW. Machine learning, computer vision and LLM agent projects, publications and experience.">
+<style>html,body{margin:0;padding:0}</style>
+<title>Haresh Kothandaraman</title>
+<script>
+(function(){var r=document.documentElement;r.classList.add("js");
+try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("loading");}catch(e){}
+setTimeout(function(){if(r.classList.contains("loading")&&!r.classList.contains("loaded")){r.classList.remove("loading");r.classList.add("ready");}},9000);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: fixed, mouse-reactive neural-network canvas behind a single column; sections reveal on scroll; projects are illustrated, filterable, tiltable cards. Deliberately single dark-blue theme. */
+:root {
+  --bg: #050b1a;
+  --surface: rgba(12, 26, 56, 0.72);
+  --surface-solid: #0c1a38;
+  --line: rgba(110, 160, 240, 0.18);
+  --fg: #e7eefc;
+  --body: #c9d6ee;
+  --muted: #93a6c9;
+  --accent: #3d9bff;
+  --accent-2: #7cd4fd;
+  --accent-ink: #04122b;
+  --good: #5ee0b0;
+  --warn: #f3c56b;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.5rem;
+  --step-3: clamp(2rem, 4vw, 2.75rem);
+  --step-4: clamp(2.5rem, 6.5vw, 4.5rem);
+  --radius: 16px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: var(--step-0); line-height: 1.65;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--bg); }
+#net { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+.veil {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(61,155,255,0.20), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(124,212,253,0.10), transparent 60%),
+    linear-gradient(180deg, rgba(5,11,26,0.1) 0%, rgba(5,11,26,0.6) 70%, rgba(5,11,26,0.8) 100%);
+}
+.glow {
+  position: fixed; left: 0; top: 0; width: 560px; height: 560px; margin: -280px 0 0 -280px;
+  border-radius: 50%; pointer-events: none; z-index: 1; opacity: 0; transition: opacity .4s;
+  background: radial-gradient(circle, rgba(61,155,255,0.16) 0%, rgba(61,155,255,0.05) 40%, transparent 70%);
+}
+.glow.on { opacity: 1; }
+a { color: var(--accent-2); text-underline-offset: 3px; }
+a:hover { color: var(--fg); }
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: 6px; }
+.wrap {
+  position: relative; z-index: 2; max-width: 1140px; margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+
+/* Scroll reveal (only when JS is running) */
+.js .reveal {
+  opacity: 0; translate: 0 28px;
+  transition: opacity .8s var(--ease) calc(var(--i, 0) * 90ms), translate .8s var(--ease) calc(var(--i, 0) * 90ms),
+              transform .3s var(--ease), border-color .3s, box-shadow .3s, background .25s;
+}
+.js .reveal.in { opacity: 1; translate: none; }
+
+/* Nav */
+header.nav {
+  transition: transform .45s var(--ease), opacity .45s;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+  background: rgba(5, 11, 26, 0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.progress { position: absolute; left: 0; bottom: -1px; height: 2px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { font-family: var(--font-mono); font-size: var(--step--1); color: var(--fg); text-decoration: none; white-space: nowrap; }
+.brand b { color: var(--accent-2); font-weight: 500; }
+.nav nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav nav a { color: var(--muted); text-decoration: none; font-size: 0.88rem; padding: 6px 12px; border-radius: 999px; transition: color .2s, background .2s; }
+.nav nav a:hover { color: var(--fg); }
+.nav nav a.active { color: var(--accent-ink); background: var(--accent-2); }
+@media (max-width: 820px) { .nav nav { display: none; } }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: 1.35fr 1fr; gap: 48px; align-items: center; padding-block: 72px 64px; scroll-margin-top: 64px; }
+.hero > * { min-width: 0; }
+.status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: var(--step--1); color: var(--good); border: 1px solid rgba(94,224,176,0.35); background: rgba(94,224,176,0.08); padding: 6px 12px; border-radius: 999px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--good); animation: ping 2s infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(94,224,176,.6); } 100% { box-shadow: 0 0 0 10px rgba(94,224,176,0); } }
+.hero-title { font-family: var(--font-display); font-weight: 800; font-size: var(--step-4); line-height: 1.03; letter-spacing: -0.03em; margin: 22px 0 18px; }
+.hero-title .name { display: block; }
+.typed-line { display: block; font-size: 0.62em; margin-top: 10px; letter-spacing: -0.02em; min-height: 2.2em; }
+.typed { background: linear-gradient(92deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.caret { display: inline-block; width: 3px; height: 0.9em; margin-left: 4px; vertical-align: -0.08em; background: var(--accent-2); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.lede { font-size: var(--step-1); color: var(--muted); max-width: 36ch; line-height: 1.5; margin: 0 0 30px; }
+.lede strong { color: var(--fg); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 9px; padding: 11px 18px; border-radius: 10px;
+  font: 600 0.95rem var(--font-body); text-decoration: none; cursor: pointer;
+  border: 1px solid var(--line); color: var(--fg); background: rgba(12,26,56,0.6);
+  transition: transform .2s var(--ease), border-color .2s, background .2s, box-shadow .2s;
+}
+.btn:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--fg); box-shadow: 0 10px 30px -12px rgba(61,155,255,.6); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: var(--accent-ink); }
+.btn svg { width: 18px; height: 18px; fill: currentColor; flex: none; }
+.scroll-hint { display: inline-flex; align-items: center; gap: 10px; margin-top: 40px; font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); text-decoration: none; }
+.scroll-hint span { width: 22px; height: 34px; border: 1.5px solid var(--muted); border-radius: 12px; position: relative; }
+.scroll-hint span::after { content: ""; position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: var(--accent-2); animation: wheel 1.6s infinite; }
+@keyframes wheel { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(12px); opacity: 0; } }
+
+/* Loader */
+.loader { display: none; }
+html { scrollbar-gutter: stable; }
+.loading .loader { display: block; position: fixed; inset: 0; z-index: 60; cursor: pointer; }
+.loading.loaded .loader { pointer-events: none; }
+.loading body { overflow: hidden; }
+.veil, main, .site-foot, .top-btn { transition: opacity 1.2s ease; }
+.loading:not(.loaded) .veil, .loading:not(.loaded) main, .loading:not(.loaded) .site-foot, .loading:not(.loaded) .top-btn { opacity: 0; }
+.loader-text { position: absolute; left: 0; right: 0; top: var(--ly, 72%); display: flex; justify-content: center; gap: 14px; font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); transition: opacity .3s; }
+.loader-text b { color: var(--accent-2); font-weight: 500; min-width: 4ch; text-align: left; font-variant-numeric: tabular-nums; }
+.loaded .loader-text { opacity: 0; }
+.loader-skip { position: absolute; right: max(20px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); opacity: .7; }
+
+/* Intro: photo + name */
+header.nav.hide { transform: translateY(-110%); opacity: 0; pointer-events: none; }
+.intro { position: relative; z-index: 2; min-height: calc(100vh - 62px); min-height: calc(100svh - 62px); display: grid; place-items: center; padding-block: 40px; }
+.intro-inner { display: flex; flex-direction: column; align-items: center; gap: 30px; text-align: center; }
+.portrait { position: relative; width: clamp(190px, 26vw, 270px); aspect-ratio: 1; max-width: 100%; }
+.portrait img { position: absolute; inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); border-radius: 50%; object-fit: cover; border: 2px solid rgba(124,212,253,.55); box-shadow: 0 0 70px -12px rgba(61,155,255,.75); transition: transform .5s var(--ease); }
+.portrait:hover img { transform: scale(1.04); }
+.portrait .ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 50%, var(--accent) 75%, var(--accent-2) 92%, transparent 100%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); animation: spin 5s linear infinite; }
+.portrait .orbit { position: absolute; inset: -18px; border-radius: 50%; border: 1px dashed rgba(124,212,253,.22); animation: spin 40s linear infinite reverse; }
+.portrait .orbit::before, .portrait .orbit::after { content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 12px var(--accent-2); }
+.portrait .orbit::before { top: -4px; left: calc(50% - 4px); }
+.portrait .orbit::after { bottom: 14%; left: 5%; width: 6px; height: 6px; background: var(--accent); }
+@keyframes spin { to { transform: rotate(360deg); } }
+.iname { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.6rem, 8vw, 5.6rem); line-height: 1; letter-spacing: -0.035em; margin: 0; text-wrap: balance; }
+.iname span { display: inline-block; }
+.iname .last { background: linear-gradient(92deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .06em; }
+.intro .scroll-hint { margin-top: 6px; }
+.js .intro .portrait, .js .intro .iname span, .js .intro .scroll-hint { opacity: 0; translate: 0 22px; }
+.js .intro .portrait { scale: .82; }
+.ready .intro .portrait, .ready .intro .iname span, .ready .intro .scroll-hint { opacity: 1; translate: none; scale: none; transition: opacity 1s var(--ease) var(--d, 0s), translate 1s var(--ease) var(--d, 0s), scale 1.1s var(--ease) var(--d, 0s); }
+
+/* Results card */
+.card-model {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-mono); font-size: 0.82rem; overflow: hidden;
+  box-shadow: 0 30px 80px -30px rgba(61,155,255,0.35);
+}
+.card-model table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.card-model tr { transition: background .2s; }
+.card-model tr:hover { background: rgba(61,155,255,0.08); }
+.card-model td { padding: 12px 16px; border-bottom: 1px solid rgba(110,160,240,0.09); vertical-align: top; }
+.card-model tr:last-child td { border-bottom: 0; }
+.card-model td:first-child { color: var(--muted); width: 58%; }
+.card-model td:last-child { text-align: right; color: var(--accent-2); font-weight: 500; white-space: nowrap; }
+.card-model tr.grp th { text-align: left; padding: 14px 16px 8px; font-weight: 500; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg); background: rgba(61,155,255,0.08); border-bottom: 1px solid var(--line); }
+.card-model tr.grp:hover { background: none; }
+.card-model tr.school td { width: auto; text-align: left; white-space: normal; padding-block: 14px; }
+.card-model .sch { display: flex; align-items: center; gap: 12px; }
+.sch-text { min-width: 0; flex: 1; display: grid; gap: 2px; }
+.sch-text .deg { font-family: var(--font-body); font-size: 0.84rem; color: var(--muted); }
+.sch-text .val { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-2); margin-top: 2px; }
+.sch-text .meter { display: block; margin-top: 6px; }
+.sch-logo { flex: none; width: 72px; height: 46px; display: grid; place-items: center; }
+.sch-logo img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 0 8px rgba(124,212,253,.25)); transition: transform .3s var(--ease); }
+.card-model tr.school:hover .sch-logo img { transform: scale(1.08); }
+.sch b { display: block; font-family: var(--font-body); font-weight: 600; font-size: 0.88rem; line-height: 1.3; color: var(--fg); margin-bottom: 2px; }
+.card-model tr.imp td { font-family: var(--font-body); font-size: 0.86rem; line-height: 1.45; color: var(--muted); text-align: left; white-space: normal; font-weight: 400; width: auto; }
+.card-model tr.imp td b { color: var(--fg); font-weight: 600; }
+.meter { height: 3px; background: rgba(110,160,240,0.14); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.6s var(--ease); }
+
+/* Sections */
+section { padding-block: 80px; scroll-margin-top: 64px; }
+.eyebrow { font-family: var(--font-mono); font-size: var(--step--1); color: var(--accent-2); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 10px; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--step-3); letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 14px; text-wrap: balance; }
+.sub { color: var(--muted); max-width: 62ch; margin: 0 0 40px; }
+
+/* About */
+.about { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; }
+.about > * { min-width: 0; }
+.about p { max-width: 62ch; margin: 0 0 16px; color: var(--body); }
+.facts { margin: 0; border-top: 1px solid var(--line); align-self: start; }
+.facts div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 8px; border-bottom: 1px solid var(--line); transition: background .2s, padding .2s; }
+.facts div:hover { background: rgba(61,155,255,0.07); padding-inline: 14px; }
+.facts dt { color: var(--muted); font-size: 0.9rem; }
+.facts dd { margin: 0; text-align: right; font-weight: 500; }
+
+/* Experience timeline */
+.timeline { position: relative; display: grid; gap: 26px; padding-left: 36px; }
+.rail, .rail-fill { position: absolute; left: 9px; top: 8px; bottom: 8px; width: 2px; border-radius: 2px; }
+.rail { background: var(--line); }
+.rail-fill { background: linear-gradient(180deg, var(--accent-2), var(--accent)); transform-origin: top; transform: scaleY(0); box-shadow: 0 0 12px rgba(124,212,253,.6); }
+.role {
+  position: relative; display: grid; grid-template-columns: 240px 1fr; gap: 32px; padding: 28px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: border-color .3s, transform .3s var(--ease), box-shadow .3s;
+}
+.role:hover { border-color: rgba(124,212,253,.45); box-shadow: 0 20px 50px -30px rgba(61,155,255,.7); }
+.role::before { content: ""; box-sizing: border-box; position: absolute; left: -33px; top: 34px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent-2); transition: background .3s, box-shadow .3s, transform .3s var(--ease); }
+.role:hover::before { transform: scale(1.45); }
+.role.in::before, .role:hover::before { background: var(--accent-2); box-shadow: 0 0 0 5px rgba(124,212,253,.18); }
+.role > * { min-width: 0; }
+.logo { margin-bottom: 16px; display: flex; align-items: center; }
+.logo img { height: 88px; width: auto; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(124,212,253,.22)); transition: transform .3s var(--ease), filter .3s; transform-origin: left center; }
+.logo--wide img { height: 28px; }
+@media (max-width: 780px) { .logo img { height: 72px; } .logo--wide img { height: 24px; } }
+.role:hover .logo img { transform: scale(1.06); filter: drop-shadow(0 0 16px rgba(124,212,253,.5)); }
+.logo.no-img { width: 132px; height: 52px; justify-content: center; border-radius: 10px; background: rgba(231,238,252,0.06); border: 1px solid var(--line); }
+.logo.no-img::before { content: attr(data-mono); font-family: var(--font-display); font-weight: 800; font-size: 1rem; letter-spacing: 0.04em; color: var(--accent-2); }
+.when { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+.org { font-family: var(--font-display); font-weight: 700; font-size: var(--step-1); line-height: 1.25; margin: 6px 0 4px; }
+.title { color: var(--accent-2); font-size: 0.92rem; }
+.role h3 { font-family: var(--font-display); font-size: var(--step-1); margin: 0 0 12px; font-weight: 600; }
+ul.points { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; color: var(--body); }
+ul.points li::marker { color: var(--accent); }
+.kpis { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.kpi { font-family: var(--font-mono); font-size: 0.8rem; padding: 6px 10px; border-radius: 8px; background: rgba(61,155,255,0.12); color: var(--accent-2); border: 1px solid rgba(61,155,255,0.25); font-variant-numeric: tabular-nums; }
+.kpi b { color: var(--fg); font-weight: 500; }
+@media (max-width: 780px) { .role { grid-template-columns: 1fr; gap: 14px; padding: 22px; } .timeline { padding-left: 28px; } .role::before { left: -25px; } .rail, .rail-fill { left: 9px; } }
+
+/* Projects */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 28px; }
+.filter {
+  font: 500 0.88rem var(--font-body); color: var(--muted); cursor: pointer;
+  padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(12,26,56,0.55);
+  transition: color .2s, background .2s, border-color .2s;
+}
+.filter:hover { color: var(--fg); border-color: var(--accent); }
+.filter[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent-2); border-color: var(--accent-2); }
+.filter .n { font-family: var(--font-mono); font-size: 0.75rem; opacity: .7; margin-left: 4px; }
+.skill-note { display: none; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-2); margin-left: 6px; }
+.skill-note.on { display: inline-flex; }
+.skill-note button { font: inherit; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.skill-note button:hover { color: var(--fg); border-color: var(--accent); }
+
+.projects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.projects.all .project.featured { grid-column: 1 / -1; }
+.projects.all .project.featured { flex-direction: row; }
+.projects.all .project.featured .media { flex: 1.1; aspect-ratio: auto; min-height: 280px; border-bottom: 0; border-right: 1px solid var(--line); }
+.projects.all .project.featured .body { flex: 1; }
+.project {
+  --mx: 50%; --my: 50%; --rx: 0deg; --ry: 0deg;
+  position: relative; display: flex; flex-direction: column; overflow: hidden; cursor: pointer;
+  border-radius: var(--radius); border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(20,44,92,0.78), rgba(8,18,40,0.82));
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: border-color .3s, box-shadow .3s, transform .25s ease-out;
+}
+.project::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(124,212,253,0.14), transparent 45%);
+}
+.project:hover { border-color: rgba(124,212,253,0.55); box-shadow: 0 30px 70px -35px rgba(61,155,255,.8); }
+.project:hover::after { opacity: 1; }
+.project[hidden] { display: none; }
+.project.dim { opacity: .28; filter: saturate(.4); }
+.project.pop { animation: pop .5s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+.media { position: relative; aspect-ratio: 16 / 8; background: radial-gradient(120% 100% at 50% 0%, #0f2550 0%, #071228 70%); border-bottom: 1px solid var(--line); overflow: hidden; max-width: 100%; }
+.media svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .6s var(--ease); }
+.project:hover .media svg { transform: scale(1.04); }
+.body { display: flex; flex-direction: column; gap: 12px; padding: 24px 26px 26px; min-width: 0; }
+.project .tag { font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.project h3 { font-family: var(--font-display); font-size: var(--step-2); line-height: 1.15; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.project p { margin: 0; color: var(--body); }
+.stack { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 0.78rem var(--font-body); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: transparent; }
+.more-link { margin-top: auto; padding-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-2); }
+.more-link i { font-style: normal; transition: transform .25s var(--ease); }
+.project:hover .more-link i { transform: translateX(5px); }
+.details { display: none; }
+@media (max-width: 880px) {
+  .projects { grid-template-columns: 1fr; }
+  .projects.all .project.featured { flex-direction: column; }
+  .projects.all .project.featured .media { min-height: 0; aspect-ratio: 16 / 8; border-right: 0; border-bottom: 1px solid var(--line); }
+}
+
+/* SVG illustration styles */
+.svg-t { font-family: var(--font-mono); font-size: 10px; fill: #93a6c9; }
+.svg-t.b { fill: #e7eefc; font-weight: 500; }
+.svg-t.c { fill: #7cd4fd; }
+.flow { stroke-dasharray: 4 6; animation: flow 1.2s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -20; } }
+.scan { animation: scan 3.2s ease-in-out infinite alternate; }
+@keyframes scan { from { transform: translateX(0); } to { transform: translateX(300px); } }
+.pulse-dot { animation: pd 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pd { 50% { transform: scale(1.35); opacity: .7; } }
+.box { animation: boxin 2.8s ease-in-out infinite; }
+@keyframes boxin { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+/* Modal */
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px max(16px, env(safe-area-inset-left, 0px)); background: rgba(3,7,18,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; transition: opacity .25s; }
+.modal[hidden] { display: none !important; }
+.modal.open { opacity: 1; }
+.panel { position: relative; width: min(760px, 100%); max-height: calc(100% - 20px); overflow: auto; border-radius: 20px; background: var(--surface-solid); border: 1px solid rgba(124,212,253,.35); box-shadow: 0 40px 120px -30px rgba(61,155,255,.6); transform: translateY(20px) scale(.98); transition: transform .3s var(--ease); }
+.modal.open .panel { transform: none; }
+.panel .media { aspect-ratio: 16 / 7; }
+.panel .inner { padding: 26px 28px 30px; display: grid; gap: 14px; }
+.panel h3 { font-family: var(--font-display); font-size: var(--step-3); line-height: 1.1; margin: 0; }
+.close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: rgba(5,11,26,.75); color: var(--fg); font-size: 20px; line-height: 1; cursor: pointer; }
+.close:hover { border-color: var(--accent-2); }
+
+/* Publications */
+.pubs { display: grid; border-top: 1px solid var(--line); }
+.pub { position: relative; display: grid; grid-template-columns: 150px 1fr auto; gap: 24px; align-items: start; padding: 24px 12px; border-bottom: 1px solid var(--line); transition: background .25s; }
+.pub::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent-2); transform: scaleY(0); transition: transform .3s var(--ease); }
+.pub:hover { background: rgba(61,155,255,0.07); }
+.pub:hover::before { transform: scaleY(1); }
+.pub > * { min-width: 0; }
+.venue { font-family: var(--font-mono); font-size: var(--step--1); color: var(--accent-2); }
+.pub h3 { font-size: 1.05rem; font-weight: 600; margin: 0 0 6px; line-height: 1.45; }
+.pub p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.pub a.paper { color: var(--fg); text-decoration: none; background-image: linear-gradient(var(--accent-2), var(--accent-2)); background-size: 0 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .35s var(--ease), color .2s; }
+.pub a.paper:hover { color: var(--accent-2); background-size: 100% 1px; }
+.pub .authors { margin-bottom: 6px; font-size: 0.86rem; }
+.pub .authors b { color: var(--fg); font-weight: 600; }
+.pub .read { display: inline-flex; align-items: center; gap: 6px; margin: 12px 14px 0 0; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--accent); color: var(--accent-2); font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; }
+.pub .read:hover { background: var(--accent-2); border-color: var(--accent-2); color: var(--accent-ink); }
+.pub .read i { font-style: normal; }
+.pub .doi { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); overflow-wrap: anywhere; }
+.state { font-family: var(--font-mono); font-size: 0.74rem; padding: 4px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid; }
+.state.ok { color: var(--good); border-color: rgba(94,224,176,0.4); background: rgba(94,224,176,0.08); }
+.state.wait { color: var(--warn); border-color: rgba(243,197,107,0.4); background: rgba(243,197,107,0.08); }
+@media (max-width: 760px) { .pub { grid-template-columns: 1fr; gap: 8px; } .pub .state { justify-self: start; } }
+
+/* Skills */
+.skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.skillset { padding: 24px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: border-color .3s; }
+.skillset:hover { border-color: rgba(124,212,253,.4); }
+.skillset h3 { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 14px; }
+.skillset .chip { color: var(--body); transition: all .2s; }
+.skillset button.chip { cursor: pointer; border-color: rgba(61,155,255,.35); }
+.skillset button.chip:hover { color: var(--accent-ink); background: var(--accent-2); border-color: var(--accent-2); transform: translateY(-2px); }
+.skillset button.chip .n { font-family: var(--font-mono); font-size: 0.7rem; opacity: .65; margin-left: 4px; }
+.hint { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); margin: -24px 0 28px; }
+@media (max-width: 880px) { .skills { grid-template-columns: 1fr; } }
+
+/* Contact */
+.contact { padding: 44px; border-radius: 20px; border: 1px solid rgba(61,155,255,0.35); background: linear-gradient(135deg, rgba(61,155,255,0.20), rgba(12,26,56,0.85) 60%); display: grid; grid-template-columns: 1.3fr 1fr; gap: 36px; align-items: center; }
+.contact > * { min-width: 0; }
+.contact h2 { margin-bottom: 10px; }
+.contact p { margin: 0; color: var(--body); max-width: 52ch; }
+.reach { display: grid; gap: 12px; }
+.mail { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; background: rgba(5,11,26,0.55); border: 1px solid var(--line); }
+.mail code { font-family: var(--font-mono); font-size: 0.86rem; flex: 1; min-width: 0; overflow-wrap: anywhere; user-select: all; }
+.mail button { font: 600 0.82rem var(--font-body); cursor: pointer; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--accent); background: transparent; color: var(--accent-2); }
+.mail button:hover { background: var(--accent); color: var(--accent-ink); }
+.reach .cta .btn { flex: 1; justify-content: center; }
+@media (max-width: 880px) { .hero, .about, .contact { grid-template-columns: 1fr; } .hero { padding-block: 56px 40px; gap: 36px; } .contact { padding: 26px; } }
+
+/* Cubing */
+.cubing { display: grid; grid-template-columns: 1fr 1.2fr; gap: 26px; align-items: start; }
+.cubing > * { min-width: 0; }
+.cube-panel { padding: 22px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: grid; gap: 14px; }
+.cube-stage { height: 290px; perspective: 1000px; display: grid; place-items: center; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.cube-stage:active { cursor: grabbing; }
+.cube { --c: 52px; position: relative; width: var(--c); height: var(--c); transform-style: preserve-3d; }
+.cubie { position: absolute; inset: 0; transform-style: preserve-3d; }
+.cubie .f { position: absolute; inset: 0; background: #070b14; border-radius: 4px; }
+.cubie .f::after { content: ""; position: absolute; inset: 3px; border-radius: 6px; background: var(--s, transparent); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), inset 0 -6px 10px rgba(0,0,0,.18); }
+.cubie .px { transform: rotateY(90deg) translateZ(calc(var(--c) / 2)); }
+.cubie .nx { transform: rotateY(-90deg) translateZ(calc(var(--c) / 2)); }
+.cubie .ny { transform: rotateX(90deg) translateZ(calc(var(--c) / 2)); }
+.cubie .py { transform: rotateX(-90deg) translateZ(calc(var(--c) / 2)); }
+.cubie .pz { transform: translateZ(calc(var(--c) / 2)); }
+.cubie .nz { transform: rotateY(180deg) translateZ(calc(var(--c) / 2)); }
+.cube-status { text-align: center; font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); }
+.cube-status b { color: var(--good); font-weight: 500; }
+.cube-moves { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.cube-moves button { font: 600 0.95rem var(--font-mono); color: var(--fg); background: rgba(5,11,26,.55); border: 1px solid var(--line); border-radius: 10px; padding: 9px 0; cursor: pointer; transition: border-color .2s, background .2s, color .2s, transform .15s; }
+.cube-moves button:hover { border-color: var(--accent-2); color: var(--accent-2); }
+.cube-moves button:active { transform: scale(.94); }
+.cube-actions { display: flex; gap: 10px; }
+.cube-actions .btn { flex: 1; justify-content: center; }
+.cube-panel button:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.cube-hint { margin: 0; font-size: 0.8rem; color: var(--muted); text-align: center; }
+.puzzles-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.puzzles-head h3 { margin: 0; font-family: var(--font-display); font-size: var(--step-1); font-weight: 700; }
+.puzzles-head span { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+.puzzle { position: relative; }
+.solved-tag { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--good); border: 1px solid rgba(94,224,176,.35); background: rgba(94,224,176,.08); padding: 2px 7px; border-radius: 999px; }
+.solved-tag::before { content: "✓"; font-weight: 700; }
+.puzzles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.puzzle { padding: 18px 16px 16px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); text-align: center; transition: border-color .3s, box-shadow .3s; }
+.puzzle:hover { border-color: rgba(124,212,253,.5); box-shadow: 0 20px 50px -30px rgba(61,155,255,.8); }
+.puzzle svg { display: block; width: 100%; max-width: 130px; aspect-ratio: 12 / 11; margin: 0 auto 10px; overflow: visible; transition: transform .6s var(--ease); }
+.puzzle:hover svg { transform: rotate(-8deg) scale(1.08); }
+.puzzle h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0 0 4px; }
+.puzzle p { margin: 0; font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+@media (max-width: 960px) { .cubing { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .puzzles { grid-template-columns: repeat(2, 1fr); } .cube { --c: 44px; } .cube-stage { height: 250px; } }
+
+footer { padding-block: 40px 56px; color: var(--muted); font-size: 0.85rem; font-family: var(--font-mono); }
+.top-btn { position: fixed; right: max(20px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); z-index: 30; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: rgba(12,26,56,.85); color: var(--accent-2); font-size: 18px; cursor: pointer; opacity: 0; transform: translateY(12px); pointer-events: none; transition: all .3s var(--ease); }
+.top-btn.show { opacity: 1; transform: none; pointer-events: auto; }
+.top-btn:hover { background: var(--accent-2); color: var(--accent-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .reveal { opacity: 1; translate: none; transition: none; }
+  .flow, .scan, .pulse-dot, .box, .status i, .caret, .scroll-hint span::after, .portrait .ring, .portrait .orbit { animation: none; }
+  .project { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="net" aria-hidden="true"></canvas>
+<div class="loader" id="loader" aria-hidden="true"><div class="loader-text"><span>initializing neural network</span><b id="loaderPct">0%</b></div><div class="loader-skip">click to skip</div></div>
+<div class="veil" aria-hidden="true"></div>
+<div class="glow" id="glow" aria-hidden="true"></div>
+
+<header class="nav hide" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">haresh<b>.k</b> / ml</a>
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#publications">Publications</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+      <a href="#cubing">Cubing</a>
+    </nav>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main id="top">
+  <section class="intro" id="intro" aria-label="Introduction">
+    <div class="wrap intro-inner">
+      <div class="portrait" style="--d:.1s"><div class="orbit"></div><div class="ring"></div><img src="images/haresh.jpg" alt="Portrait of Haresh Kothandaraman"></div>
+      <h1 class="iname"><span style="--d:.35s">Haresh</span> <span class="last" style="--d:.5s">Kothandaraman</span></h1>
+      <a class="scroll-hint" style="--d:.9s" href="#hero"><span></span>Scroll</a>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="hero" id="hero">
+      <div>
+        <span class="status reveal"><i></i>Open to Summer 2027 ML / Data Science internships</span>
+        <div class="hero-title reveal" style="--i:1" role="heading" aria-level="2">
+          <span class="name">Haresh Kothandaraman.</span>
+          <span class="typed-line">I build <span class="typed" id="typed">computer vision models</span><span class="caret" aria-hidden="true"></span></span>
+        </div>
+        <p class="lede reveal" style="--i:2">Data Science MS at the <strong>University of Washington</strong>. Former <strong>Samsung R&amp;D</strong> intern with published research in medical imaging.</p>
+        <div class="cta reveal" style="--i:3">
+          <a class="btn primary" href="#projects">See my work</a>
+          <a class="btn" href="https://github.com/K-Haresh" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/in/haresh-kothandaraman/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>LinkedIn</a>
+        </div>
+        <a class="scroll-hint reveal" style="--i:4" href="#about"><span></span>Keep scrolling · click the background to fire the network</a>
+      </div>
+
+      <aside class="card-model reveal" style="--i:2" id="results" aria-label="Results summary">
+        <table>
+          <tr class="grp"><th colspan="2">Academics</th></tr>
+          <tr class="school"><td colspan="2"><div class="sch"><span class="sch-logo"><img src="images/uw.png" alt="University of Washington logo"></span><span class="sch-text"><b>University of Washington</b><span class="deg">MS, Data Science</span><span class="val">2026 – 2028 · Seattle</span></span></div></td></tr>
+          <tr class="school"><td colspan="2"><div class="sch"><span class="sch-logo"><img src="images/srm.png" alt="SRM Institute of Science and Technology logo"></span><span class="sch-text"><b>SRM Institute of Science and Technology</b><span class="deg">B.Tech, Computer Science</span><span class="val"><span class="count" data-to="9.9" data-dec="1">9.9</span> / 10 CGPA</span><span class="meter"><i data-w="99"></i></span></span></div></td></tr>
+          <tr><td>Class rank, CSE department</td><td>Top 5% of 1,900</td></tr>
+
+          <tr class="grp"><th colspan="2">Outcomes</th></tr>
+          <tr class="imp"><td colspan="2"><b>Published in Springer LNNS.</b> Retinal-scan lesion detection aimed at earlier diabetic retinopathy screening, presented orally at ICIDA 2025.</td></tr>
+          <tr class="imp"><td colspan="2"><b>Content provenance at Samsung R&amp;D.</b> Traces AI-generated images back to the engine that made them, not just flags them.</td></tr>
+          <tr class="imp"><td colspan="2"><b>Replaced manual reporting at Chennai Metro.</b> Daily entries, exits and night halts now come out of a Python script instead of hand-built spreadsheets.</td></tr>
+          <tr class="imp"><td colspan="2"><b>Trading agents grounded in live context.</b> Retrieval fast enough (&lt;&nbsp;100&nbsp;ms) to sit inside every agent decision.</td></tr>
+
+          <tr class="grp"><th colspan="2">Model results</th></tr>
+          <tr><td>Real vs GenAI image detection<div class="meter"><i data-w="99"></i></div></td><td><span class="count" data-to="99.0" data-dec="1">99.0</span>% acc</td></tr>
+          <tr><td>Generator attribution (4 engines)<div class="meter"><i data-w="97.8"></i></div></td><td><span class="count" data-to="97.8" data-dec="1">97.8</span>% acc</td></tr>
+          <tr><td>NPDR red-lesion detection<div class="meter"><i data-w="98"></i></div></td><td><span class="count" data-to="98.0" data-dec="1">98.0</span>% acc</td></tr>
+        </table>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap">
+      <p class="eyebrow reveal">About me</p>
+      <div class="about">
+        <div>
+          <h2 class="reveal">Research rigor, engineering habits.</h2>
+          <p class="reveal" style="--i:1">I'm a first-year Master's student in Data Science at the University of Washington in Seattle. Before that I finished a B.Tech in Computer Science at SRM Institute of Science and Technology, ranking in the top 5% of a department of 1,900.</p>
+          <p class="reveal" style="--i:2">Most of my work sits where deep learning meets real constraints. At Samsung R&amp;D I built a hybrid CNN that tells human photos apart from AI-generated ones and traces synthetic images back to the generator that made them. In medical imaging I've published on detecting diabetic retinopathy lesions in retinal scans. More recently I've been building multi-agent LLM systems with LangGraph, MCP and retrieval pipelines.</p>
+          <p class="reveal" style="--i:3">I also spent two years as a research assistant on fractional PDEs and Lie symmetry methods, and I have a competitive programming background including ICPC. I like problems where the math matters and the result has to run in production.</p>
+        </div>
+        <dl class="facts reveal" style="--i:2">
+          <div><dt>Based in</dt><dd>Seattle, WA</dd></div>
+          <div><dt>Studying</dt><dd>MS Data Science, UW (2026–28)</dd></div>
+          <div><dt>Focus</dt><dd>CV · LLM agents · RAG</dd></div>
+          <div><dt>Core languages</dt><dd>Python · C++ · SQL</dd></div>
+          <div><dt>Looking for</dt><dd>Summer 2027 internships</dd></div>
+          <div><dt>Relocation</dt><dd>Open, US-wide</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="wrap">
+      <p class="eyebrow reveal">Experience</p>
+      <h2 class="reveal">Where I've worked</h2>
+      <p class="sub reveal">Industry R&amp;D, academic research and a stint inside a metro rail operator.</p>
+      <div class="timeline" id="timeline">
+        <div class="rail" aria-hidden="true"></div>
+        <div class="rail-fill" id="railFill" aria-hidden="true"></div>
+
+        <article class="role reveal">
+          <div>
+            <div class="logo logo--wide" data-mono="SAMSUNG R&amp;D"><img src="images/samsung.png" onerror="this.parentElement.classList.add('no-img');this.remove()" alt="Samsung logo"></div>
+            <div class="when">Oct 2024 – Jun 2025</div>
+            <div class="org">Samsung R&amp;D Institute India</div>
+            <div class="title">Samsung PRISM Intern</div>
+          </div>
+          <div>
+            <h3>Detecting and attributing AI-generated images</h3>
+            <ul class="points">
+              <li>Designed a hybrid ResNet50 + EfficientNetB0 model that separates human-made images from GenAI images and attributes synthetic ones to Midjourney, Stable Diffusion, FLUX or DALL·E.</li>
+              <li>Built the full classification and watermark source-attribution pipeline, from data to evaluation.</li>
+              <li>Wrote up the work as a research paper, now under review.</li>
+            </ul>
+            <div class="kpis"><span class="kpi"><b>99%</b> real vs synthetic</span><span class="kpi"><b>97.8%</b> generator attribution</span><span class="kpi"><b>4</b> generators traced</span></div>
+          </div>
+        </article>
+
+        <article class="role reveal">
+          <div>
+            <div class="logo" data-mono="SRM IST"><img src="images/srm.png" onerror="this.parentElement.classList.add('no-img');this.remove()" alt="SRM Institute of Science and Technology logo"></div>
+            <div class="when">May 2023 – Apr 2025</div>
+            <div class="org">SRM Institute of Science and Technology</div>
+            <div class="title">Research Assistant · Dr. Bibekananda Bira</div>
+          </div>
+          <div>
+            <h3>Conservation laws for time-fractional fluid models</h3>
+            <ul class="points">
+              <li>Investigated Lie symmetry-based conservation laws for (3+1)-D time-fractional incompressible fluid models.</li>
+              <li>Derived exact solutions and computed numerical ones for the resulting ODEs and PDEs using SciPy.</li>
+              <li>Built comparative Matplotlib visualizations of analytical vs numerical behavior to validate the theory.</li>
+            </ul>
+            <div class="kpis"><span class="kpi"><b>2 yrs</b> research</span><span class="kpi"><b>1</b> paper under review</span></div>
+          </div>
+        </article>
+
+        <article class="role reveal">
+          <div>
+            <div class="logo" data-mono="CMRL"><img src="images/cmrl.png" onerror="this.parentElement.classList.add('no-img');this.remove()" alt="Chennai Metro Rail Limited logo"></div>
+            <div class="when">Jun 2024 – Jul 2024</div>
+            <div class="org">Chennai Metro Rail Limited</div>
+            <div class="title">Software Developer Intern</div>
+          </div>
+          <div>
+            <h3>Automating parking and revenue reporting</h3>
+            <ul class="points">
+              <li>Wrote a Python program that processes raw parking Excel files and computes daily vehicle entries, exits and night halts.</li>
+              <li>Worked on Excel revenue computations inside CMRL's revenue cell to speed up financial reporting.</li>
+              <li>Learned how metro operations run end to end: train working, operation control and the revenue cell.</li>
+            </ul>
+            <div class="kpis"><span class="kpi"><b>3</b> daily metrics automated</span><span class="kpi"><b>Excel → Python</b> pipeline</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="wrap">
+      <p class="eyebrow reveal">Projects</p>
+      <h2 class="reveal">Things I've built</h2>
+      <p class="sub reveal">Filter by area, or click any card for the full breakdown.</p>
+      <div class="toolbar reveal" role="group" aria-label="Filter projects">
+        <button class="filter" type="button" data-f="all" aria-pressed="true">All</button>
+        <button class="filter" type="button" data-f="cv" aria-pressed="false">Computer vision</button>
+        <button class="filter" type="button" data-f="llm" aria-pressed="false">LLMs &amp; NLP</button>
+        <button class="filter" type="button" data-f="data" aria-pressed="false">Data &amp; analytics</button>
+        <button class="filter" type="button" data-f="research" aria-pressed="false">Research</button>
+        <span class="skill-note" id="skillNote">Using <b id="skillName"></b><button type="button" id="skillClear">Clear</button></span>
+      </div>
+
+      <div class="projects all" id="projectGrid">
+
+        <!-- 1. Hedge fund agents -->
+        <article class="project featured reveal" data-cat="llm" data-stack="langgraph,mcp,faiss,sentence transformers,rag,fastapi,python,llm" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 220" role="img" aria-label="Five agents around a LangGraph orchestrator, over a price chart">
+              <g data-gen="candles" opacity=".35"></g>
+              <g stroke="#3d9bff" stroke-width="1.3" fill="none">
+                <line class="flow" x1="200" y1="110" x2="200" y2="34"/>
+                <line class="flow" x1="200" y1="110" x2="276" y2="88"/>
+                <line class="flow" x1="200" y1="110" x2="247" y2="178"/>
+                <line class="flow" x1="200" y1="110" x2="153" y2="178"/>
+                <line class="flow" x1="200" y1="110" x2="124" y2="88"/>
+                <path class="flow" d="M276 88 C320 100 335 140 330 160" stroke="#7cd4fd"/>
+              </g>
+              <circle cx="200" cy="110" r="30" fill="#0c1a38" stroke="#7cd4fd" stroke-width="1.5"/>
+              <text x="200" y="107" text-anchor="middle" class="svg-t b">Lang</text>
+              <text x="200" y="120" text-anchor="middle" class="svg-t b">Graph</text>
+              <g fill="#0a1530" stroke="#3d9bff" stroke-width="1.3">
+                <circle class="pulse-dot" cx="200" cy="34" r="12"/><circle class="pulse-dot" cx="276" cy="88" r="12" style="animation-delay:.4s"/><circle class="pulse-dot" cx="247" cy="178" r="12" style="animation-delay:.8s"/><circle class="pulse-dot" cx="153" cy="178" r="12" style="animation-delay:1.2s"/><circle class="pulse-dot" cx="124" cy="88" r="12" style="animation-delay:1.6s"/>
+              </g>
+              <text x="200" y="16" text-anchor="middle" class="svg-t c">research</text>
+              <text x="296" y="78" class="svg-t c">strategy</text>
+              <text x="266" y="204" class="svg-t c">risk</text>
+              <text x="110" y="204" class="svg-t c">execution</text>
+              <text x="60" y="78" class="svg-t c">portfolio</text>
+              <g transform="translate(316 158)"><ellipse cx="14" cy="4" rx="14" ry="4" fill="#0c1a38" stroke="#7cd4fd"/><path d="M0 4 v18 a14 4 0 0 0 28 0 v-18" fill="#0c1a38" stroke="#7cd4fd"/><text x="14" y="42" text-anchor="middle" class="svg-t">FAISS</text></g>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">LLM agents · Production</span>
+            <h3>Agentic System for Hedge Fund Trading</h3>
+            <p>A five-agent LangGraph system with MCP tool integration that researches markets, orchestrates tools and coordinates trading decisions through structured outputs, grounded by a sub-100 ms RAG layer.</p>
+            <div class="stack"><span class="chip">LangGraph</span><span class="chip">MCP</span><span class="chip">FAISS</span><span class="chip">Sentence Transformers</span><span class="chip">RAG</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Built and deployed a production-grade 5-agent LangGraph system with MCP integration for autonomous market research, tool orchestration, structured outputs and coordinated trading workflows.</li>
+              <li>Engineered a low-latency RAG pipeline using FAISS, semantic chunking and Sentence Transformers, reaching sub-100 ms retrieval latency to ground downstream agent decisions in financial context.</li>
+              <li>Developed evaluation and observability pipelines to monitor agent behavior, tool usage, retrieval quality and system outputs, enabling systematic optimization of the multi-agent workflow.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 2. Diabetic retinopathy -->
+        <article class="project reveal" data-cat="cv research" data-stack="tensorflow,keras,opencv,albumentations,transfer learning,python" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="Retinal fundus image with detected red lesions boxed">
+              <defs>
+                <radialGradient id="fundus" cx="45%" cy="45%" r="60%"><stop offset="0" stop-color="#ffb070"/><stop offset=".55" stop-color="#cf5428"/><stop offset="1" stop-color="#4a1208"/></radialGradient>
+                <radialGradient id="disc"><stop offset="0" stop-color="#fff4d6"/><stop offset=".6" stop-color="#ffd08a" stop-opacity=".8"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>
+              </defs>
+              <circle cx="190" cy="100" r="84" fill="url(#fundus)"/>
+              <g stroke="#7a1a0c" stroke-width="2.4" fill="none" opacity=".85" stroke-linecap="round">
+                <path d="M235 92 C210 72 180 52 130 50"/><path d="M235 92 C205 110 170 135 125 150"/><path d="M235 92 C242 64 232 40 216 24"/><path d="M235 92 C246 124 240 154 226 180"/><path d="M235 92 C220 90 190 96 150 100"/><path d="M180 62 C170 80 160 86 140 84" stroke-width="1.4"/>
+              </g>
+              <circle cx="235" cy="92" r="20" fill="url(#disc)"/>
+              <g fill="#4d0606"><circle cx="160" cy="74" r="3.5"/><circle cx="178" cy="136" r="4.5"/><circle cx="140" cy="118" r="2.8"/><circle cx="208" cy="152" r="3.2"/></g>
+              <g fill="none" stroke="#7cd4fd" stroke-width="1.3" class="box">
+                <rect x="152" y="66" width="16" height="16" rx="2"/><rect x="169" y="127" width="18" height="18" rx="2"/><rect x="133" y="111" width="14" height="14" rx="2"/><rect x="200" y="144" width="16" height="16" rx="2"/>
+              </g>
+              <g transform="translate(296 46)"><rect width="88" height="108" rx="8" fill="#0c1a38" stroke="rgba(110,160,240,.35)"/>
+                <text x="10" y="20" class="svg-t">CLAHE</text><text x="10" y="40" class="svg-t">vessel supp.</text><text x="10" y="60" class="svg-t">EffNetV2</text><text x="10" y="80" class="svg-t">+ CBAM</text><text x="10" y="98" class="svg-t c">4 lesions</text></g>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">Computer vision · Medical imaging</span>
+            <h3>Red Lesion Detection in Diabetic Retinopathy</h3>
+            <p>Finds red lesions in retinal fundus images with a ResNet–EfficientNet model, later extended with EfficientNetV2 and CBAM attention. Two Springer papers came out of it.</p>
+            <div class="stack"><span class="chip">TensorFlow</span><span class="chip">Keras</span><span class="chip">OpenCV</span><span class="chip">98% acc</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Built a deep learning pipeline using a ResNet–EfficientNet architecture in TensorFlow, reaching 97% classification accuracy for automated red-lesion detection.</li>
+              <li>Applied CLAHE, morphological processing, vessel suppression and lesion-enhancement techniques to the fundus images.</li>
+              <li>Extended the framework with EfficientNetV2 and CBAM to improve feature extraction, reaching 98% accuracy for non-proliferative diabetic retinopathy.</li>
+              <li>Published at ICIDA 2025 (Springer LNNS): <a href="https://link.springer.com/chapter/10.1007/978-3-032-27845-6_20" target="_blank" rel="noopener">read the paper ↗</a>. Extension at IC3DCM 2026 (Springer).</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 3. GenAI attribution -->
+        <article class="project reveal" data-cat="cv" data-stack="pytorch,transfer learning,cuda,python,scikit-learn" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="Five image tiles scanned and classified as human or by generator">
+              <defs>
+                <linearGradient id="t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a8f6a"/><stop offset="1" stop-color="#1f3a2c"/></linearGradient>
+                <linearGradient id="t2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b86bff"/><stop offset="1" stop-color="#3b1a6b"/></linearGradient>
+                <linearGradient id="t3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a6b"/><stop offset="1" stop-color="#6b2a1a"/></linearGradient>
+                <linearGradient id="t4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6bd8ff"/><stop offset="1" stop-color="#1a3d6b"/></linearGradient>
+                <linearGradient id="t5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd86b"/><stop offset="1" stop-color="#6b551a"/></linearGradient>
+              </defs>
+              <g transform="translate(16 44)">
+                <rect x="0" width="64" height="64" rx="8" fill="url(#t1)"/><circle cx="22" cy="24" r="10" fill="#ffffff" opacity=".25"/><path d="M0 52 L22 34 L40 48 L64 30 L64 64 L0 64Z" fill="#000" opacity=".25"/>
+                <rect x="76" width="64" height="64" rx="8" fill="url(#t2)"/><circle cx="108" cy="32" r="16" fill="#ffffff" opacity=".18"/>
+                <rect x="152" width="64" height="64" rx="8" fill="url(#t3)"/><rect x="166" y="14" width="36" height="36" rx="18" fill="#ffffff" opacity=".18"/>
+                <rect x="228" width="64" height="64" rx="8" fill="url(#t4)"/><path d="M228 44 Q260 20 292 44 L292 64 L228 64Z" fill="#ffffff" opacity=".15"/>
+                <rect x="304" width="64" height="64" rx="8" fill="url(#t5)"/><circle cx="336" cy="32" r="12" fill="#000" opacity=".2"/>
+                <rect class="scan" x="0" y="-6" width="3" height="76" fill="#7cd4fd" opacity=".9"/>
+                <g transform="translate(0 84)">
+                  <text x="0" class="svg-t b">human</text><text x="76" class="svg-t">midjourney</text><text x="152" class="svg-t">stable diff.</text><text x="228" class="svg-t">flux</text><text x="304" class="svg-t">dall·e</text>
+                  <g transform="translate(0 10)" fill="#3d9bff"><rect width="60" height="4" rx="2"/><rect x="76" width="56" height="4" rx="2"/><rect x="152" width="58" height="4" rx="2"/><rect x="228" width="54" height="4" rx="2"/><rect x="304" width="57" height="4" rx="2"/></g>
+                </g>
+              </g>
+              <text x="16" y="28" class="svg-t c">real or generated? which engine?</text>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">Computer vision · Content provenance</span>
+            <h3>GenAI Image Classification &amp; Source Attribution</h3>
+            <p>Built at Samsung R&amp;D. An ensemble of ResNet50 and EfficientNetB0 decides whether an image is real or generated, then names the generator that made it.</p>
+            <div class="stack"><span class="chip">PyTorch</span><span class="chip">Ensembles</span><span class="chip">CUDA</span><span class="chip">99% acc</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Developed a hybrid ResNet50–EfficientNetB0 model to distinguish human-made images from GenAI images and attribute synthetic images to Midjourney, Stable Diffusion, FLUX and DALL·E.</li>
+              <li>Reached 99% accuracy on human vs GenAI detection and 97.8% on identifying which engine produced an image.</li>
+              <li>Built an end-to-end classification and watermark source-attribution pipeline to trace images to their generating source.</li>
+              <li>Paper under review: Hybrid Deep Learning Framework for AI-Generated Image Classification and Watermark Source Attribution.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 4. BART summarizer -->
+        <article class="project reveal" data-cat="llm" data-stack="hugging face,nlp,python,transformers" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="A research paper condensed by BART into a short summary with keywords">
+              <g transform="translate(28 22)">
+                <rect width="104" height="156" rx="6" fill="#e7eefc" opacity=".92"/>
+                <rect x="12" y="12" width="64" height="7" rx="2" fill="#0c1a38"/>
+                <g fill="#93a6c9"><rect x="12" y="28" width="80" height="4" rx="2"/><rect x="12" y="38" width="74" height="4" rx="2"/><rect x="12" y="48" width="80" height="4" rx="2"/><rect x="12" y="58" width="60" height="4" rx="2"/></g>
+                <rect x="12" y="70" width="80" height="34" rx="3" fill="#3d9bff" opacity=".45"/>
+                <path d="M16 100 L34 84 L48 94 L66 78 L88 96" stroke="#0c1a38" stroke-width="1.5" fill="none"/>
+                <g fill="#93a6c9"><rect x="12" y="112" width="80" height="4" rx="2"/><rect x="12" y="122" width="70" height="4" rx="2"/><rect x="12" y="132" width="80" height="4" rx="2"/><rect x="12" y="142" width="50" height="4" rx="2"/></g>
+              </g>
+              <g stroke="#3d9bff" stroke-width="1.4" fill="none"><path class="flow" d="M138 100 H168"/><path class="flow" d="M258 100 H284"/></g>
+              <path d="M170 64 L208 80 L208 120 L170 136 Z" fill="#0c1a38" stroke="#7cd4fd" stroke-width="1.3"/>
+              <path d="M256 64 L218 80 L218 120 L256 136 Z" fill="#0c1a38" stroke="#7cd4fd" stroke-width="1.3"/>
+              <text x="213" y="56" text-anchor="middle" class="svg-t b">BART</text>
+              <text x="189" y="104" text-anchor="middle" class="svg-t">enc</text><text x="237" y="104" text-anchor="middle" class="svg-t">dec</text>
+              <g transform="translate(288 54)">
+                <rect width="96" height="92" rx="8" fill="#0c1a38" stroke="rgba(124,212,253,.5)"/>
+                <text x="10" y="18" class="svg-t c">summary</text>
+                <g fill="#7cd4fd"><rect x="10" y="28" width="74" height="4" rx="2"/><rect x="10" y="38" width="66" height="4" rx="2"/><rect x="10" y="48" width="72" height="4" rx="2"/></g>
+                <rect x="10" y="62" width="34" height="14" rx="7" fill="none" stroke="#3d9bff"/><rect x="48" y="62" width="38" height="14" rx="7" fill="none" stroke="#3d9bff"/>
+              </g>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">NLP · Transformers</span>
+            <h3>Research Paper Summarizer using BART</h3>
+            <p>A desktop app that reads academic PDFs and produces summaries with Facebook AI's BART transformer, plus keyword extraction and figure previews.</p>
+            <div class="stack"><span class="chip">BART</span><span class="chip">Hugging Face</span><span class="chip">PyMuPDF</span><span class="chip">Tkinter</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Developed a Python application that summarizes academic research papers using Facebook AI's BART transformer model.</li>
+              <li>Integrated keyword extraction and image parsing from PDFs using PyPDF2 and PyMuPDF for richer content analysis.</li>
+              <li>Designed a Tkinter GUI for PDF upload, summary viewing, image previews and report export.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 5. Fractional fluid PDE -->
+        <article class="project reveal" data-cat="research" data-stack="python,scipy,numpy,matplotlib" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="Waterfall plot of a travelling soliton wave">
+              <g data-gen="soliton"></g>
+              <text x="20" y="28" class="svg-t c">u(x, t) · soliton solution</text>
+              <text x="330" y="186" class="svg-t">x →</text>
+              <text x="20" y="186" class="svg-t">t ↑</text>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">Scientific computing · Applied math</span>
+            <h3>Solving Time-Fractional Fluid Models</h3>
+            <p>Exact, numerical and soliton solutions for a (3+1)-D time-fractional incompressible fluid model via Lie symmetry analysis, with Python numerics and visual comparisons.</p>
+            <div class="stack"><span class="chip">SciPy</span><span class="chip">NumPy</span><span class="chip">Matplotlib</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Investigated Lie symmetry-based conservation laws for (3+1)-D time-fractional incompressible fluid models.</li>
+              <li>Derived and analyzed exact and numerical solutions of ODEs and PDEs with SciPy.</li>
+              <li>Generated comparative visualizations of analytical and numerical results in Matplotlib to validate theoretical findings.</li>
+              <li>Paper under review with Dr. Bibekananda Bira.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 6. CMRL parking -->
+        <article class="project reveal" data-cat="data" data-stack="python,excel,pandas,data cleaning" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="Daily parking entries, exits and night halts above a metro train">
+              <g data-gen="bars"></g>
+              <g transform="translate(18 18)"><rect width="8" height="8" fill="#3d9bff"/><text x="12" y="8" class="svg-t">entries</text><rect x="64" width="8" height="8" fill="#7cd4fd"/><text x="76" y="8" class="svg-t">exits</text><circle cx="124" cy="4" r="4" fill="#f3c56b"/><text x="132" y="8" class="svg-t">night halts</text></g>
+              <line x1="0" y1="190" x2="400" y2="190" stroke="#93a6c9" stroke-width="1" opacity=".5"/>
+              <g class="scan" style="animation-duration:7s">
+                <rect x="20" y="166" width="96" height="20" rx="8" fill="#0c1a38" stroke="#7cd4fd"/>
+                <g fill="#7cd4fd" opacity=".7"><rect x="30" y="171" width="12" height="7" rx="1"/><rect x="48" y="171" width="12" height="7" rx="1"/><rect x="66" y="171" width="12" height="7" rx="1"/><rect x="84" y="171" width="12" height="7" rx="1"/></g>
+                <rect x="100" y="171" width="10" height="9" rx="2" fill="#3d9bff"/>
+              </g>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">Data automation · Internship</span>
+            <h3>CMRL Parking Management System</h3>
+            <p>A Python tool for Chennai Metro that turns raw parking spreadsheets into daily entry, exit and night-halt reports, ready in Excel.</p>
+            <div class="stack"><span class="chip">Python</span><span class="chip">Excel</span><span class="chip">Data cleaning</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Designed a Python program to calculate and display entry counts, exit counts and night-halt vehicle data, producing outputs in Excel.</li>
+              <li>Cleaned and preprocessed raw Excel data to keep calculations accurate and results structured.</li>
+              <li>Implemented custom aggregation logic that made parking reports faster to produce for the operations team.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 7. Power BI -->
+        <article class="project reveal" data-cat="data" data-stack="power bi,data modeling,sql,excel,data cleaning" tabindex="0">
+          <div class="media">
+            <svg viewBox="0 0 400 200" role="img" aria-label="Sales dashboard with KPI tiles, a trend line and a regional donut chart">
+              <rect x="16" y="14" width="368" height="172" rx="10" fill="#0c1a38" stroke="rgba(110,160,240,.3)"/>
+              <g transform="translate(30 28)">
+                <g><rect width="104" height="46" rx="6" fill="#102449"/><text x="10" y="16" class="svg-t">revenue</text><path d="M10 36 L26 30 L42 33 L58 24 L74 26 L94 16" stroke="#7cd4fd" stroke-width="1.6" fill="none"/></g>
+                <g transform="translate(116 0)"><rect width="104" height="46" rx="6" fill="#102449"/><text x="10" y="16" class="svg-t">sales growth</text><g fill="#3d9bff"><rect x="12" y="30" width="8" height="8"/><rect x="26" y="26" width="8" height="12"/><rect x="40" y="28" width="8" height="10"/><rect x="54" y="22" width="8" height="16"/><rect x="68" y="20" width="8" height="18"/><rect x="82" y="16" width="8" height="22"/></g></g>
+                <g transform="translate(232 0)"><rect width="104" height="46" rx="6" fill="#102449"/><text x="10" y="16" class="svg-t">markets</text><g fill="#7cd4fd"><circle cx="20" cy="32" r="4"/><circle cx="36" cy="32" r="4" opacity=".75"/><circle cx="52" cy="32" r="4" opacity=".5"/><circle cx="68" cy="32" r="4" opacity=".3"/></g></g>
+              </g>
+              <g transform="translate(30 86)">
+                <rect width="220" height="88" rx="6" fill="#102449"/>
+                <g stroke="rgba(147,166,201,.2)"><line x1="10" y1="22" x2="210" y2="22"/><line x1="10" y1="44" x2="210" y2="44"/><line x1="10" y1="66" x2="210" y2="66"/></g>
+                <path d="M10 70 L40 60 L70 64 L100 46 L130 50 L160 34 L190 30 L210 20 L210 80 L10 80Z" fill="#3d9bff" opacity=".18"/>
+                <path d="M10 70 L40 60 L70 64 L100 46 L130 50 L160 34 L190 30 L210 20" stroke="#3d9bff" stroke-width="2" fill="none"/>
+                <circle cx="210" cy="20" r="3.5" fill="#7cd4fd"/>
+              </g>
+              <g transform="translate(316 130)">
+                <circle r="32" fill="none" stroke="#102449" stroke-width="12"/>
+                <circle r="32" fill="none" stroke="#3d9bff" stroke-width="12" stroke-dasharray="80 201" transform="rotate(-90)"/>
+                <circle r="32" fill="none" stroke="#7cd4fd" stroke-width="12" stroke-dasharray="55 201" stroke-dashoffset="-80" transform="rotate(-90)"/>
+                <circle r="32" fill="none" stroke="#f3c56b" stroke-width="12" stroke-dasharray="36 201" stroke-dashoffset="-135" transform="rotate(-90)"/>
+              </g>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="tag">BI · Dashboards</span>
+            <h3>Sales Insight Dashboard</h3>
+            <p>A Power BI dashboard that pulls sales data from several sources into one model and surfaces revenue, sales growth and regional performance.</p>
+            <div class="stack"><span class="chip">Power BI</span><span class="chip">Data modeling</span><span class="chip">ETL</span></div>
+            <span class="more-link">View details <i>→</i></span>
+          </div>
+          <div class="details">
+            <ul class="points">
+              <li>Developed a Power BI dashboard showcasing sales insights with real-time visualizations to support decision-making.</li>
+              <li>Extracted, cleaned and transformed data from multiple sources for accurate, consistent reporting.</li>
+              <li>Linked schemas across datasets for clean integration and presented KPIs such as revenue, sales growth and regional performance.</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATIONS -->
+  <section id="publications">
+    <div class="wrap">
+      <p class="eyebrow reveal">Publications</p>
+      <h2 class="reveal">Papers</h2>
+      <p class="sub reveal">Peer-reviewed work in medical imaging, generative AI forensics and applied mathematics.</p>
+      <div class="pubs">
+        <article class="pub reveal">
+          <div class="venue">ICIDA 2025<br>Springer LNNS<br>vol. 2012</div>
+          <div><h3><a class="paper" href="https://link.springer.com/chapter/10.1007/978-3-032-27845-6_20" target="_blank" rel="noopener">Red Lesion Segmentation from Retinal Fundus Images for Diabetic Retinopathy Disease Detection Using ResNet and EfficientNet Models</a></h3><p class="authors"><b>H. Kothandaraman</b>, K. Pusapati, P. Saranya · <i>Innovations in Data Analytics</i>, 2026</p><p>Presented orally at ICIDA 2025. Hybrid CNN pipeline reaching 97% classification accuracy.</p><a class="read" href="https://link.springer.com/chapter/10.1007/978-3-032-27845-6_20" target="_blank" rel="noopener">Read on Springer <i>↗</i></a><span class="doi">DOI 10.1007/978-3-032-27845-6_20</span></div>
+          <span class="state ok">Published</span>
+        </article>
+        <article class="pub reveal" style="--i:1">
+          <div class="venue">IC3DCM 2026<br>Springer</div>
+          <div><h3>Detection of Non-Proliferative Diabetic Retinopathy via Red Lesion Segmentation Using EfficientNetV2 and CBAM</h3><p>Attention-augmented extension reaching 98% accuracy on NPDR red-lesion detection.</p></div>
+          <span class="state wait">In publication</span>
+        </article>
+        <article class="pub reveal" style="--i:2">
+          <div class="venue">Samsung R&amp;D<br>work</div>
+          <div><h3>Hybrid Deep Learning Framework for AI-Generated Image Classification and Watermark Source Attribution Using ResNet50, EfficientNetB0, and Ensemble Models</h3><p>99% real-vs-synthetic accuracy; 97.8% generator attribution across four engines.</p></div>
+          <span class="state wait">Under review</span>
+        </article>
+        <article class="pub reveal" style="--i:3">
+          <div class="venue">Applied math<br>with Dr. Bira</div>
+          <div><h3>Exact Solutions, Numerical Solutions, Soliton Solutions and Conservation Laws of (3+1)-D Time Fractional Incompressible Fluid Model via Lie Symmetry</h3><p>Symmetry analysis and conservation laws for a fractional-order fluid system.</p></div>
+          <span class="state wait">Under review</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="wrap">
+      <p class="eyebrow reveal">Skills</p>
+      <h2 class="reveal">Toolkit</h2>
+      <p class="sub reveal">What I reach for, grouped by where it fits in the work.</p>
+      <p class="hint reveal">Click a highlighted skill to see the projects that use it.</p>
+      <div class="skills">
+        <div class="skillset reveal">
+          <h3>ML &amp; Deep Learning</h3>
+          <div class="stack"><span class="chip">PyTorch</span><span class="chip">TensorFlow</span><span class="chip">Keras</span><span class="chip">Scikit-learn</span><span class="chip">Hugging Face</span><span class="chip">Transfer learning</span><span class="chip">OpenCV</span><span class="chip">Albumentations</span><span class="chip">CUDA</span><span class="chip">Feature engineering</span><span class="chip">Model evaluation</span></div>
+        </div>
+        <div class="skillset reveal" style="--i:1">
+          <h3>LLMs &amp; NLP</h3>
+          <div class="stack"><span class="chip">LangGraph</span><span class="chip">MCP</span><span class="chip">RAG</span><span class="chip">FAISS</span><span class="chip">Sentence Transformers</span><span class="chip">Transformers</span><span class="chip">NLP</span><span class="chip">Prompt engineering</span></div>
+        </div>
+        <div class="skillset reveal" style="--i:2">
+          <h3>Engineering &amp; Data</h3>
+          <div class="stack"><span class="chip">Python</span><span class="chip">C / C++</span><span class="chip">SQL</span><span class="chip">Java</span><span class="chip">TypeScript</span><span class="chip">FastAPI</span><span class="chip">Docker</span><span class="chip">Git</span><span class="chip">NumPy</span><span class="chip">SciPy</span><span class="chip">Matplotlib</span><span class="chip">Power BI</span><span class="chip">Excel</span><span class="chip">Data modeling</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact reveal">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>Let's talk.</h2>
+          <p>I'm looking for Summer 2027 internships in machine learning, data science and applied AI research. I'm open to roles anywhere in the US.</p>
+        </div>
+        <div class="reach">
+          <div class="mail"><code id="email">haresh.kothandaraman@gmail.com</code><button type="button" id="copy">Copy</button></div>
+          <div class="cta">
+            <a class="btn" href="https://github.com/K-Haresh" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.550-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>GitHub</a>
+            <a class="btn" href="https://www.linkedin.com/in/haresh-kothandaraman/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg>LinkedIn</a>
+          </div>
+          <div class="when">Seattle, WA · +1 (206) 807-0447</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- CUBING -->
+  <section id="cubing">
+    <div class="wrap">
+      <p class="eyebrow reveal">Off the clock</p>
+      <h2 class="reveal">I like solving cubes.</h2>
+      <p class="sub reveal">Solving cubes calms me down. I'm not into competitive speedcubing; I just pick one up when I want to relax and clear my head. Try turning the one below.</p>
+      <div class="cubing">
+        <div class="cube-panel reveal">
+          <div class="cube-stage" id="cubeStage" aria-label="Interactive 3x3 cube. Drag to rotate it.">
+            <div class="cube" id="cube"></div>
+          </div>
+          <div class="cube-status" id="cubeStatus" aria-live="polite">Solved · drag to rotate</div>
+          <div class="cube-moves" role="group" aria-label="Turn a face">
+            <button type="button" data-move="U" title="Top face">U</button>
+            <button type="button" data-move="D" title="Bottom face">D</button>
+            <button type="button" data-move="L" title="Left face">L</button>
+            <button type="button" data-move="R" title="Right face">R</button>
+            <button type="button" data-move="F" title="Front face">F</button>
+            <button type="button" data-move="B" title="Back face">B</button>
+          </div>
+          <div class="cube-actions">
+            <button type="button" class="btn" id="scrambleBtn">Scramble</button>
+            <button type="button" class="btn primary" id="solveBtn">Solve</button>
+          </div>
+          <p class="cube-hint">Face buttons turn clockwise; hold Shift for counter-clockwise. Solve plays your moves back in reverse.</p>
+        </div>
+
+        <div class="puzzle-col">
+        <div class="puzzles-head reveal">
+          <h3>Cubes I've solved</h3>
+          <span>6 types</span>
+        </div>
+        <div class="puzzles">
+          <article class="puzzle reveal" style="--i:0"><svg viewBox="0 0 120 110" data-puzzle="2" role="img" aria-label="2 by 2 cube"></svg><span class="solved-tag">Can solve</span><h3>2×2</h3><p>3,674,160 possible states</p></article>
+          <article class="puzzle reveal" style="--i:1"><svg viewBox="0 0 120 110" data-puzzle="3" role="img" aria-label="3 by 3 cube"></svg><span class="solved-tag">Can solve</span><h3>3×3</h3><p>43 quintillion states, solvable in 20 moves</p></article>
+          <article class="puzzle reveal" style="--i:2"><svg viewBox="0 0 120 110" data-puzzle="4" role="img" aria-label="4 by 4 cube"></svg><span class="solved-tag">Can solve</span><h3>4×4</h3><p>No fixed centres, so parity cases appear</p></article>
+          <article class="puzzle reveal" style="--i:3"><svg viewBox="0 0 120 110" data-puzzle="mirror" role="img" aria-label="Mirror cube"></svg><span class="solved-tag">Can solve</span><h3>Mirror cube</h3><p>One colour, solved by shape alone</p></article>
+          <article class="puzzle reveal" style="--i:4"><svg viewBox="0 0 120 110" data-puzzle="pyra" role="img" aria-label="Pyraminx"></svg><span class="solved-tag">Can solve</span><h3>Pyraminx</h3><p>A tetrahedron with 933,120 states</p></article>
+          <article class="puzzle reveal" style="--i:5"><svg viewBox="0 0 120 110" data-puzzle="mega" role="img" aria-label="Megaminx"></svg><span class="solved-tag">Can solve</span><h3>Megaminx</h3><p>12 faces, about 10<sup>68</sup> states</p></article>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="wrap site-foot"><footer>© 2026 Haresh Kothandaraman</footer></div>
+<button class="top-btn" id="topBtn" type="button" aria-label="Back to top">↑</button>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="panel">
+    <button class="close" id="mClose" type="button" aria-label="Close">×</button>
+    <div class="media" id="mMedia"></div>
+    <div class="inner">
+      <span class="eyebrow" id="mTag" style="margin:0"></span>
+      <h3 id="mTitle"></h3>
+      <div id="mBody"></div>
+      <div class="stack" id="mStack"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.documentElement.classList.add("js");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const finePointer = matchMedia("(pointer: fine)").matches;
+const NS = "http://www.w3.org/2000/svg";
+const mk = (tag, attrs, parent) => { const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); parent && parent.appendChild(el); return el; };
+
+/* ---------- Generated illustration parts ---------- */
+document.querySelectorAll('[data-gen="candles"]').forEach(g => {
+  let p = 140;
+  for (let i = 0; i < 26; i++) {
+    const x = 10 + i * 15, o = p, c = p + (Math.sin(i * 1.7) * 14 + (Math.random() - .55) * 18);
+    const hi = Math.min(o, c) - 6 - Math.random() * 8, lo = Math.max(o, c) + 6 + Math.random() * 8;
+    const up = c < o, col = up ? "#5ee0b0" : "#3d9bff";
+    mk("line", { x1: x + 3, x2: x + 3, y1: hi, y2: lo, stroke: col }, g);
+    mk("rect", { x, y: Math.min(o, c), width: 6, height: Math.max(2, Math.abs(c - o)), fill: col }, g);
+    p = Math.max(60, Math.min(190, c));
+  }
+});
+document.querySelectorAll('[data-gen="soliton"]').forEach(g => {
+  for (let k = 0; k < 9; k++) {
+    const base = 170 - k * 13, cx = 90 + k * 26, off = k * 10;
+    let d = "";
+    for (let x = 0; x <= 300; x += 4) {
+      const s = 1 / Math.cosh((x - cx + off) / 22);
+      d += (x ? "L" : "M") + (40 + x + off * 0.4).toFixed(1) + " " + (base - 62 * s * s).toFixed(1);
+    }
+    mk("path", { d, fill: "none", stroke: k === 8 ? "#7cd4fd" : "#3d9bff", "stroke-width": k === 8 ? 2 : 1.2, opacity: (0.35 + k * 0.08).toFixed(2) }, g);
+  }
+});
+document.querySelectorAll('[data-gen="bars"]').forEach(g => {
+  const days = ["M", "T", "W", "T", "F", "S", "S"], ent = [62, 70, 66, 74, 88, 54, 40], ex = [58, 68, 64, 70, 84, 56, 44], nh = [8, 10, 9, 12, 16, 6, 4];
+  let pts = "";
+  days.forEach((d, i) => {
+    const x = 150 + i * 32;
+    mk("rect", { x, y: 150 - ent[i], width: 11, height: ent[i], rx: 2, fill: "#3d9bff" }, g);
+    mk("rect", { x: x + 13, y: 150 - ex[i], width: 11, height: ex[i], rx: 2, fill: "#7cd4fd" }, g);
+    const t = mk("text", { x: x + 12, y: 163, "text-anchor": "middle", class: "svg-t" }, g); t.textContent = d;
+    pts += `${x + 12},${150 - nh[i] * 5} `;
+  });
+  mk("polyline", { points: pts.trim(), fill: "none", stroke: "#f3c56b", "stroke-width": 1.8 }, g);
+  pts.trim().split(" ").forEach(p => { const [x, y] = p.split(","); mk("circle", { cx: x, cy: y, r: 3, fill: "#f3c56b" }, g); });
+});
+
+/* ---------- Typed role ---------- */
+(() => {
+  const el = document.getElementById("typed");
+  const words = ["computer vision models", "multi-agent LLM systems", "low-latency RAG pipelines", "dashboards people use", "research that gets published"];
+  if (reduce) return;
+  let w = 0, i = words[0].length, del = true;
+  const tick = () => {
+    const word = words[w];
+    i += del ? -1 : 1;
+    el.textContent = word.slice(0, i);
+    let wait = del ? 35 : 70;
+    if (!del && i === word.length) { del = true; wait = 1800; }
+    else if (del && i === 0) { del = false; w = (w + 1) % words.length; wait = 300; }
+    setTimeout(tick, wait);
+  };
+  setTimeout(tick, 2200);
+})();
+
+/* ---------- Scroll reveal ---------- */
+const revealIO = "IntersectionObserver" in window ? new IntersectionObserver(es => {
+  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revealIO.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }) : null;
+document.querySelectorAll(".reveal").forEach(el => revealIO ? revealIO.observe(el) : el.classList.add("in"));
+
+/* ---------- Counters + meters ---------- */
+(() => {
+  const card = document.getElementById("results");
+  const meters = card.querySelectorAll(".meter i"), counts = card.querySelectorAll(".count");
+  if (reduce) { meters.forEach(m => m.style.width = m.dataset.w + "%"); return; }
+  meters.forEach(m => m.style.width = "0%");
+  counts.forEach(c => c.textContent = (0).toFixed(+c.dataset.dec));
+  const run = () => {
+    meters.forEach(m => m.style.width = m.dataset.w + "%");
+    const t0 = performance.now(), D = 1600;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      counts.forEach(c => c.textContent = (+c.dataset.to * e).toFixed(+c.dataset.dec));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  if (!("IntersectionObserver" in window)) return run();
+  const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); setTimeout(run, 400); } }, { threshold: 0.3 });
+  io.observe(card);
+})();
+
+/* ---------- Scroll: progress, active nav, timeline rail, top button ---------- */
+(() => {
+  const bar = document.getElementById("progress"), fill = document.getElementById("railFill"), tl = document.getElementById("timeline"), topBtn = document.getElementById("topBtn");
+  const links = [...document.querySelectorAll(".nav nav a")], nav = document.getElementById("nav"), intro = document.getElementById("intro");
+  const secs = links.map(a => document.querySelector(a.getAttribute("href")));
+  let ticking = false;
+  const update = () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${h > 0 ? scrollY / h : 0})`;
+    const r = tl.getBoundingClientRect();
+    const p = Math.max(0, Math.min(1, (innerHeight * 0.65 - r.top) / r.height));
+    fill.style.transform = `scaleY(${p})`;
+    let cur = -1;
+    secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top < innerHeight * 0.4) cur = i; });
+    links.forEach((a, i) => a.classList.toggle("active", i === cur));
+    topBtn.classList.toggle("show", scrollY > 700);
+    nav.classList.toggle("hide", scrollY < intro.offsetHeight * 0.45);
+    ticking = false;
+  };
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener("resize", update);
+  update();
+  topBtn.addEventListener("click", () => scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }));
+})();
+
+/* ---------- Cursor glow ---------- */
+const mouse = { x: -9999, y: -9999, active: false };
+(() => {
+  const glow = document.getElementById("glow");
+  let gx = 0, gy = 0;
+  addEventListener("pointermove", e => {
+    mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true;
+    if (finePointer) glow.classList.add("on");
+  }, { passive: true });
+  document.addEventListener("pointerleave", () => { mouse.active = false; glow.classList.remove("on"); });
+  if (!finePointer || reduce) return;
+  const loop = () => { gx += (mouse.x - gx) * 0.12; gy += (mouse.y - gy) * 0.12; glow.style.transform = `translate(${gx}px, ${gy}px)`; requestAnimationFrame(loop); };
+  loop();
+})();
+
+/* ---------- Project cards: tilt, spotlight, filters, skills, modal ---------- */
+(() => {
+  const grid = document.getElementById("projectGrid");
+  const cards = [...grid.querySelectorAll(".project")];
+  const filters = [...document.querySelectorAll(".filter")];
+  const note = document.getElementById("skillNote"), noteName = document.getElementById("skillName");
+
+  cards.forEach(card => {
+    card.addEventListener("pointermove", e => {
+      const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      card.style.setProperty("--mx", x + "px"); card.style.setProperty("--my", y + "px");
+      if (finePointer && !reduce) {
+        card.style.setProperty("--ry", ((x / r.width - .5) * 7).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((.5 - y / r.height) * 7).toFixed(2) + "deg");
+      }
+    });
+    card.addEventListener("pointerleave", () => { card.style.setProperty("--rx", "0deg"); card.style.setProperty("--ry", "0deg"); });
+    card.addEventListener("click", () => openModal(card));
+    card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModal(card); } });
+  });
+
+  // counts on filter buttons
+  filters.forEach(b => {
+    const f = b.dataset.f, n = f === "all" ? cards.length : cards.filter(c => c.dataset.cat.split(" ").includes(f)).length;
+    const s = document.createElement("span"); s.className = "n"; s.textContent = n; b.appendChild(s);
+  });
+
+  function applyFilter(f) {
+    filters.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === f)));
+    grid.classList.toggle("all", f === "all");
+    cards.forEach(c => {
+      c.classList.remove("dim");
+      const show = f === "all" || c.dataset.cat.split(" ").includes(f);
+      const was = !c.hidden;
+      c.hidden = !show;
+      if (show) { c.classList.add("in"); if (!was || !reduce) { c.classList.remove("pop"); void c.offsetWidth; if (!reduce) c.classList.add("pop"); } }
+    });
+    note.classList.remove("on");
+  }
+  filters.forEach(b => b.addEventListener("click", () => applyFilter(b.dataset.f)));
+
+  function applySkill(skill) {
+    applyFilter("all");
+    filters.forEach(b => b.setAttribute("aria-pressed", "false"));
+    const key = skill.toLowerCase();
+    cards.forEach(c => c.classList.toggle("dim", !c.dataset.stack.split(",").includes(key)));
+    noteName.textContent = skill; note.classList.add("on");
+    document.getElementById("projects").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+  }
+  document.getElementById("skillClear").addEventListener("click", () => applyFilter("all"));
+
+  // make skills that map to projects clickable
+  document.querySelectorAll(".skillset .chip").forEach(chip => {
+    const name = chip.textContent.trim(), key = name.toLowerCase();
+    const n = cards.filter(c => c.dataset.stack.split(",").includes(key)).length;
+    if (!n) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = name;
+    const s = document.createElement("span"); s.className = "n"; s.textContent = n; b.appendChild(s);
+    b.setAttribute("aria-label", `Show ${n} project${n > 1 ? "s" : ""} using ${name}`);
+    b.addEventListener("click", () => applySkill(name));
+    chip.replaceWith(b);
+  });
+
+  // modal
+  const modal = document.getElementById("modal"), closeBtn = document.getElementById("mClose");
+  let lastFocus = null;
+  function openModal(card) {
+    lastFocus = card;
+    document.getElementById("mMedia").innerHTML = card.querySelector(".media").innerHTML;
+    document.getElementById("mTag").textContent = card.querySelector(".tag").textContent;
+    document.getElementById("mTitle").textContent = card.querySelector("h3").textContent;
+    document.getElementById("mBody").innerHTML = card.querySelector(".details").innerHTML;
+    document.getElementById("mStack").innerHTML = card.querySelector(".stack").innerHTML;
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add("open"));
+    document.body.style.overflow = "hidden";
+    closeBtn.focus();
+  }
+  function closeModal() {
+    modal.classList.remove("open");
+    document.body.style.overflow = "";
+    setTimeout(() => { modal.hidden = true; }, reduce ? 0 : 250);
+    lastFocus && lastFocus.focus();
+  }
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+})();
+
+/* ---------- Cubing: puzzle illustrations ---------- */
+(() => {
+  const COL = { W: "#eef3fb", Y: "#ffd84d", R: "#ef4b4b", O: "#ff9334", G: "#2fc46f", B: "#3d8bff" };
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = (base, mix) => rnd() < mix ? Object.values(COL)[(rnd() * 6) | 0] : base;
+  const poly = (g, pts, fill, extra = {}) => mk("polygon", { points: pts.map(p => p.map(v => v.toFixed(2)).join(",")).join(" "), fill, ...extra }, g);
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1]], mul = (a, k) => [a[0] * k, a[1] * k];
+
+  // isometric box; cuts are fractions along each face edge
+  function iso(svg, cuts, faceFill, gap = 0.035) {
+    const L = 52, T = [60, 8], a = [0.866 * L, 0.5 * L], b = [-0.866 * L, 0.5 * L], d = [0, L];
+    const faces = [
+      { o: T, e1: a, e2: b, key: "top" },
+      { o: add(T, b), e1: a, e2: d, key: "left" },
+      { o: add(add(T, a), b), e1: mul(b, -1), e2: d, key: "right" }
+    ];
+    poly(svg, [T, add(T, a), add(add(T, a), d), add(add(add(T, a), b), d), add(add(T, b), d), add(T, b)], "#070b14");
+    faces.forEach(f => {
+      for (let i = 0; i < cuts.length - 1; i++) for (let j = 0; j < cuts.length - 1; j++) {
+        const u0 = cuts[i] + gap, u1 = cuts[i + 1] - gap, v0 = cuts[j] + gap, v1 = cuts[j + 1] - gap;
+        const P = (u, v) => add(add(f.o, mul(f.e1, u)), mul(f.e2, v));
+        poly(svg, [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)], faceFill(f.key, i, j), { "stroke-linejoin": "round" });
+      }
+    });
+  }
+
+  function tri(svg, A, B, C, n, fill) {
+    const P = (i, j) => add(add(A, mul([B[0] - A[0], B[1] - A[1]], i / n)), mul([C[0] - A[0], C[1] - A[1]], j / n));
+    const shrink = (pts) => { const c = [(pts[0][0] + pts[1][0] + pts[2][0]) / 3, (pts[0][1] + pts[1][1] + pts[2][1]) / 3]; return pts.map(p => add(c, mul([p[0] - c[0], p[1] - c[1]], 0.84))); };
+    let k = 0;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n - i; j++) {
+      poly(svg, shrink([P(i, j), P(i + 1, j), P(i, j + 1)]), fill(k++));
+      if (j < n - i - 1) poly(svg, shrink([P(i + 1, j), P(i + 1, j + 1), P(i, j + 1)]), fill(k++));
+    }
+  }
+
+  const gen = {
+    2: svg => iso(svg, [0, .5, 1], (f) => ({ top: COL.W, left: COL.G, right: COL.R })[f], 0.04),
+    3: svg => { seed = 11; iso(svg, [0, 1 / 3, 2 / 3, 1], (f) => pick({ top: COL.W, left: COL.G, right: COL.R }[f], 0.3)); },
+    4: svg => { seed = 5; iso(svg, [0, .25, .5, .75, 1], (f) => pick({ top: COL.Y, left: COL.B, right: COL.O }[f], 0.15), 0.03); },
+    mirror: svg => {
+      const defs = mk("defs", {}, svg);
+      [["mt", "#f4f7fb", "#9aa6b8"], ["ml", "#c9d1dc", "#6b778a"], ["mr", "#aab4c3", "#4d586b"]].forEach(([id, c1, c2]) => {
+        const g = mk("linearGradient", { id: "mg-" + id, x1: 0, y1: 0, x2: 1, y2: 1 }, defs);
+        mk("stop", { offset: 0, "stop-color": c1 }, g); mk("stop", { offset: 1, "stop-color": c2 }, g);
+      });
+      iso(svg, [0, .18, .62, 1], (f) => ({ top: "url(#mg-mt)", left: "url(#mg-ml)", right: "url(#mg-mr)" })[f], 0.025);
+    },
+    pyra: svg => {
+      seed = 3;
+      const A = [60, 6], Bl = [10, 96], C = [110, 96], D = [60, 104];
+      poly(svg, [A, Bl, D, C], "#070b14");
+      tri(svg, A, Bl, D, 3, () => pick(COL.G, 0.2));
+      tri(svg, A, D, C, 3, () => pick(COL.R, 0.2));
+    },
+    mega: svg => {
+      seed = 9;
+      const cx = 60, cy = 58, R = 36, N = 5, rot = -Math.PI / 2, t = 0.36;
+      const V = (rad, i, off = 0) => [cx + rad * Math.cos(rot + off + i * 2 * Math.PI / N), cy + rad * Math.sin(rot + off + i * 2 * Math.PI / N)];
+      const outer = [...Array(N)].map((_, i) => V(R, i)), inner = [...Array(N)].map((_, i) => V(R * 0.4, i));
+      const ring = [...Array(N)].map((_, i) => V(R * 1.5, i, Math.PI / 5));
+      const others = [COL.R, COL.Y, COL.B, COL.O, "#b06bff"];
+      const at = (p, q, k) => add(p, mul([q[0] - p[0], q[1] - p[1]], k));
+      const shrink = (pts, k) => { const c = pts.reduce((s, p) => add(s, mul(p, 1 / pts.length)), [0, 0]); return pts.map(p => add(c, mul([p[0] - c[0], p[1] - c[1]], k))); };
+      for (let i = 0; i < N; i++) {
+        const o1 = outer[i], o2 = outer[(i + 1) % N];
+        poly(svg, [o1, ring[i], o2], "#070b14");
+        poly(svg, shrink([at(o1, o2, .08), ring[i], at(o2, o1, .08)], .82), others[i], { opacity: .8 });
+      }
+      poly(svg, outer, "#070b14");
+      for (let i = 0; i < N; i++) {
+        const o = outer[i], next = outer[(i + 1) % N], prev = outer[(i + N - 1) % N];
+        poly(svg, shrink([o, at(o, next, t), inner[i], at(o, prev, t)], .84), pick(COL.G, .18));
+        poly(svg, shrink([at(o, next, t), at(next, o, t), inner[(i + 1) % N], inner[i]], .84), pick(COL.G, .18));
+      }
+      poly(svg, shrink(inner, .8), COL.G);
+    }
+  };
+  document.querySelectorAll("svg[data-puzzle]").forEach(svg => gen[svg.dataset.puzzle] && gen[svg.dataset.puzzle](svg));
+})();
+
+/* ---------- Cubing: interactive 3x3 ---------- */
+(() => {
+  const cubeEl = document.getElementById("cube"), stage = document.getElementById("cubeStage");
+  if (!cubeEl) return;
+  const status = document.getElementById("cubeStatus");
+  const buttons = [...document.querySelectorAll(".cube-panel button")];
+  const STICK = { px: "#ef4b4b", nx: "#ff9334", ny: "#eef3fb", py: "#ffd84d", pz: "#2fc46f", nz: "#3d8bff" };
+  const cubies = [];
+  for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
+    if (!x && !y && !z) continue;
+    const el = document.createElement("div"); el.className = "cubie";
+    const faces = { px: x === 1, nx: x === -1, py: y === 1, ny: y === -1, pz: z === 1, nz: z === -1 };
+    for (const k in faces) {
+      const f = document.createElement("div"); f.className = "f " + k;
+      if (faces[k]) f.style.setProperty("--s", STICK[k]);
+      el.appendChild(f);
+    }
+    cubeEl.appendChild(el);
+    cubies.push({ el, p: [x, y, z], m: [1, 0, 0, 0, 1, 0, 0, 0, 1] });
+  }
+  // rotation matrices (row-major 3x3), CSS axes: x right, y down, z toward viewer
+  const rot = (axis, a) => {
+    const c = Math.cos(a), s = Math.sin(a);
+    if (axis === 0) return [1, 0, 0, 0, c, -s, 0, s, c];
+    if (axis === 1) return [c, 0, s, 0, 1, 0, -s, 0, c];
+    return [c, -s, 0, s, c, 0, 0, 0, 1];
+  };
+  const mm = (A, B) => { const r = []; for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) r.push(A[i * 3] * B[j] + A[i * 3 + 1] * B[3 + j] + A[i * 3 + 2] * B[6 + j]); return r; };
+  const mv = (A, v) => [0, 1, 2].map(i => A[i * 3] * v[0] + A[i * 3 + 1] * v[1] + A[i * 3 + 2] * v[2]);
+  const size = () => parseFloat(getComputedStyle(cubeEl).getPropertyValue("--c")) || 52;
+  const place = (c, M, P) => {
+    const k = size();
+    c.el.style.transform = `matrix3d(${M[0]},${M[3]},${M[6]},0,${M[1]},${M[4]},${M[7]},0,${M[2]},${M[5]},${M[8]},0,${P[0] * k},${P[1] * k},${P[2] * k},1)`;
+  };
+  const render = () => cubies.forEach(c => place(c, c.m, c.p));
+  render();
+  addEventListener("resize", render);
+
+  // face turn = [axis, layer, angle sign] for a clockwise turn seen from that face
+  const MOVES = { U: [1, -1, -1], D: [1, 1, 1], R: [0, 1, 1], L: [0, -1, -1], F: [2, 1, 1], B: [2, -1, -1] };
+  const history = [];
+  let busy = false;
+
+  function turn(name, prime, speed = 220) {
+    return new Promise(res => {
+      const [axis, layer, sign] = MOVES[name], dir = sign * (prime ? -1 : 1);
+      const moving = cubies.filter(c => Math.round(c.p[axis]) === layer);
+      const done = () => {
+        const R = rot(axis, dir * Math.PI / 2).map(Math.round);
+        moving.forEach(c => { c.m = mm(R, c.m).map(Math.round); c.p = mv(R, c.p).map(Math.round); place(c, c.m, c.p); });
+        res();
+      };
+      if (reduce) return done();
+      const t0 = performance.now();
+      const step = now => {
+        const k = Math.min(1, (now - t0) / speed), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        const R = rot(axis, dir * e * Math.PI / 2);
+        moving.forEach(c => place(c, mm(R, c.m), mv(R, c.p)));
+        if (k < 1) requestAnimationFrame(step); else done();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+  const setBusy = b => { busy = b; buttons.forEach(x => x.disabled = b); };
+  const updateStatus = () => {
+    status.innerHTML = history.length === 0 ? "<b>Solved</b> · drag to rotate" : `${history.length} move${history.length > 1 ? "s" : ""} from solved`;
+  };
+
+  document.querySelectorAll(".cube-moves button").forEach(b => b.addEventListener("click", async e => {
+    if (busy) return;
+    setBusy(true);
+    const prime = e.shiftKey;
+    await turn(b.dataset.move, prime);
+    const last = history[history.length - 1];
+    if (last && last[0] === b.dataset.move && last[1] !== prime) history.pop(); else history.push([b.dataset.move, prime]);
+    updateStatus(); setBusy(false);
+  }));
+  document.getElementById("scrambleBtn").addEventListener("click", async () => {
+    if (busy) return;
+    setBusy(true);
+    const names = Object.keys(MOVES);
+    let prev = "";
+    for (let i = 0; i < 18; i++) {
+      let n; do { n = names[(Math.random() * 6) | 0]; } while (n === prev);
+      prev = n;
+      const prime = Math.random() < .5;
+      await turn(n, prime, 120);
+      history.push([n, prime]); updateStatus();
+    }
+    setBusy(false);
+  });
+  document.getElementById("solveBtn").addEventListener("click", async () => {
+    if (busy || !history.length) return;
+    setBusy(true);
+    while (history.length) {
+      const [n, prime] = history.pop();
+      await turn(n, !prime, history.length > 6 ? 110 : 170);
+      updateStatus();
+    }
+    setBusy(false);
+  });
+
+  // drag to rotate the whole cube; slow idle spin
+  let rx = -28, ry = -38, drag = null, lastMove = 0;
+  const view = () => { cubeEl.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`; };
+  view();
+  stage.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, rx, ry }; stage.setPointerCapture(e.pointerId); });
+  stage.addEventListener("pointermove", e => {
+    if (!drag) return;
+    ry = drag.ry + (e.clientX - drag.x) * 0.5;
+    rx = Math.max(-80, Math.min(80, drag.rx - (e.clientY - drag.y) * 0.5));
+    lastMove = performance.now(); view();
+  });
+  const end = () => { drag = null; lastMove = performance.now(); };
+  stage.addEventListener("pointerup", end); stage.addEventListener("pointercancel", end);
+  if (!reduce) {
+    const spin = now => {
+      if (!drag && now - lastMove > 2500) { ry += 0.12; view(); }
+      requestAnimationFrame(spin);
+    };
+    requestAnimationFrame(spin);
+  }
+  updateStatus();
+})();
+
+/* ---------- Copy email ---------- */
+document.getElementById("copy").addEventListener("click", e => {
+  const btn = e.currentTarget, el = document.getElementById("email");
+  const done = msg => { btn.textContent = msg; setTimeout(() => btn.textContent = "Copy", 1600); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); done("Selected"); };
+  try { navigator.clipboard.writeText(el.textContent).then(() => done("Copied"), fallback); } catch (_) { fallback(); }
+});
+
+/* ---------- Neural network background: brain loader that morphs into the live network ---------- */
+(() => {
+  const cv = document.getElementById("net"), ctx = cv.getContext("2d");
+  const root = document.documentElement, loader = document.getElementById("loader"), pct = document.getElementById("loaderPct");
+  const BUILD = 3600, HOLD = 2000, MORPH = 2000;
+  const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  let W, H, layers = [], edges = [], pulses = [], last = 0, brain = null;
+  let phase = root.classList.contains("loading") ? "brain" : "live";
+  let t0 = performance.now();
+  if (phase === "live") root.classList.add("ready");
+
+  function build() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const sizes = W < 600 ? [4, 6, 6, 3] : [5, 8, 10, 10, 7, 3];
+    layers = sizes.map((n, l) => {
+      const x = W * (0.08 + 0.84 * l / (sizes.length - 1));
+      return Array.from({ length: n }, (_, i) => {
+        const y = H * (0.12 + 0.76 * (i + 0.5) / n) + (Math.random() - 0.5) * 18;
+        return { x, y, bx: x, by: y, ph: Math.random() * 6.28, glow: 0, hover: 0 };
+      });
+    });
+    edges = [];
+    for (let l = 0; l < layers.length - 1; l++)
+      for (const a of layers[l]) for (const b of layers[l + 1])
+        if (Math.random() < 0.7) edges.push({ a, b, l, w: Math.random() });
+    pulses = [];
+    if (phase !== "live") buildBrain();
+  }
+
+  // Side-view brain (facing left): cerebrum with gyri bumps, main sulci, striped cerebellum and brainstem
+  function buildBrain() {
+    const s = Math.min(W * (W < 600 ? 0.42 : 0.34), H * 0.3, 250), cx = W / 2, cy = H * 0.42;
+    const P = ([u, v]) => [cx + u * s, cy + v * s];
+    // Catmull-Rom spline through control points
+    const spline = (ctrl, closed, per = 14) => {
+      const out = [], n = ctrl.length, get = i => closed ? ctrl[(i + n) % n] : ctrl[Math.max(0, Math.min(n - 1, i))];
+      const segs = closed ? n : n - 1;
+      for (let i = 0; i < segs; i++) {
+        const p0 = get(i - 1), p1 = get(i), p2 = get(i + 1), p3 = get(i + 2);
+        for (let k = 0; k < per; k++) {
+          const t = k / per, t2 = t * t, t3 = t2 * t;
+          out.push([0, 1].map(d => 0.5 * ((2 * p1[d]) + (-p0[d] + p2[d]) * t + (2 * p0[d] - 5 * p1[d] + 4 * p2[d] - p3[d]) * t2 + (-p0[d] + 3 * p1[d] - 3 * p2[d] + p3[d]) * t3)));
+        }
+      }
+      if (!closed) out.push(ctrl[n - 1]);
+      return out;
+    };
+    // push points outward along the normal in small waves = the bumpy gyri edge
+    const wobble = (pts, amp, freq, closed) => pts.map((p, i) => {
+      const a = pts[closed ? (i - 1 + pts.length) % pts.length : Math.max(0, i - 1)], b = pts[closed ? (i + 1) % pts.length : Math.min(pts.length - 1, i + 1)];
+      const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      const w = amp * Math.abs(Math.sin(i / pts.length * Math.PI * freq));
+      return [p[0] + dy / L * w, p[1] - dx / L * w];
+    });
+    const cerebrumCtrl = [[-0.74, 0.30], [-0.93, 0.12], [-1.0, -0.14], [-0.93, -0.42], [-0.74, -0.63], [-0.46, -0.77], [-0.12, -0.83], [0.2, -0.8], [0.5, -0.69], [0.75, -0.49], [0.92, -0.22], [0.98, 0.06], [0.9, 0.28], [0.7, 0.38], [0.44, 0.36], [0.2, 0.44], [-0.08, 0.5], [-0.34, 0.45], [-0.5, 0.33], [-0.6, 0.36]];
+    const cerebrum = wobble(spline(cerebrumCtrl, true, 16), 0.035, 46, true);
+    const cbCtrl = [[0.36, 0.42], [0.56, 0.36], [0.82, 0.4], [0.94, 0.52], [0.88, 0.66], [0.66, 0.74], [0.44, 0.7], [0.32, 0.58]];
+    const cerebellum = wobble(spline(cbCtrl, true, 12), 0.02, 30, true);
+    const stem = spline([[0.18, 0.46], [0.22, 0.62], [0.24, 0.8], [0.25, 0.98]], false, 10)
+      .concat(spline([[0.37, 0.98], [0.36, 0.8], [0.36, 0.64], [0.34, 0.5]], false, 10));
+    const inPoly = (u, v, poly) => {
+      let c = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const [xi, yi] = poly[i], [xj, yj] = poly[j];
+        if ((yi > v) !== (yj > v) && u < (xj - xi) * (v - yi) / (yj - yi) + xi) c = !c;
+      }
+      return c;
+    };
+    const inside = (u, v) => inPoly(u, v, cerebrum) || inPoly(u, v, cerebellum) || (u > 0.22 && u < 0.35 && v > 0.45 && v < 0.95);
+    const N = W < 600 ? 95 : 155, minD = W < 600 ? 0.11 : 0.085;
+    const pts = [];
+    for (let t = 0; pts.length < N && t < 40000; t++) {
+      const u = Math.random() * 2.04 - 1.02, v = Math.random() * 1.85 - 0.86;
+      if (!inside(u, v) || pts.some(p => Math.hypot(p.u - u, p.v - v) < minD)) continue;
+      pts.push({ u, v });
+    }
+    pts.forEach(p => {
+      [p.x, p.y] = P([p.u, p.v]);
+      // grows up out of the brainstem
+      p.at = (Math.hypot(p.u - 0.3, p.v - 0.95) / 2.1) * BUILD * 0.82 + Math.random() * BUILD * 0.1;
+    });
+    const bedges = [], seen = new Set();
+    pts.forEach((p, i) => {
+      pts.map((q, j) => [j, Math.hypot(p.u - q.u, p.v - q.v)]).filter(([j]) => j !== i)
+        .sort((a, b) => a[1] - b[1]).slice(0, 3).forEach(([j, d]) => {
+          const key = i < j ? i + "-" + j : j + "-" + i;
+          if (d > 0.26 || seen.has(key)) return;
+          seen.add(key); bedges.push({ a: pts[i], b: pts[j], w: Math.random() });
+        });
+    });
+    const line = (ctrl, a, amp = 0.012, freq = 9) => ({ pts: wobble(spline(ctrl, false, 12), amp, freq, false).map(P), a });
+    const outline = [
+      { pts: cerebrum.map(P), a: 1 },
+      { pts: cerebellum.map(P), a: 0.9 },
+      { pts: stem.slice(0, 11).map(P), a: 0.85 },
+      { pts: stem.slice(11).map(P), a: 0.85 },
+      line([[-0.54, 0.26], [-0.3, 0.12], [0.0, 0.06], [0.28, -0.02], [0.5, -0.1]], 0.7, 0.008, 4),           // lateral fissure
+      line([[0.06, -0.82], [-0.02, -0.6], [0.06, -0.4], [-0.02, -0.2], [0.04, 0.02]], 0.6, 0.006, 4),       // central sulcus
+      line([[-0.26, -0.78], [-0.36, -0.55], [-0.28, -0.32], [-0.4, -0.12]], 0.4),
+      line([[-0.62, -0.62], [-0.7, -0.38], [-0.6, -0.16], [-0.72, 0.04]], 0.4),
+      line([[-0.85, -0.2], [-0.66, -0.26], [-0.48, -0.2], [-0.22, -0.3]], 0.32),
+      line([[0.3, -0.76], [0.24, -0.5], [0.34, -0.28], [0.26, -0.08]], 0.4),
+      line([[0.58, -0.6], [0.5, -0.38], [0.62, -0.16], [0.56, 0.06]], 0.4),
+      line([[0.8, -0.34], [0.7, -0.12], [0.82, 0.1]], 0.32),
+      line([[-0.36, 0.34], [-0.1, 0.26], [0.18, 0.24], [0.4, 0.14]], 0.35),
+      line([[0.44, 0.47], [0.66, 0.44], [0.88, 0.5]], 0.3, 0.004, 3),                                      // cerebellum folia
+      line([[0.4, 0.56], [0.64, 0.54], [0.9, 0.6]], 0.3, 0.004, 3),
+      line([[0.46, 0.65], [0.66, 0.64], [0.82, 0.67]], 0.3, 0.004, 3)
+    ];
+    const nodes = layers.flat(), pool = [...pts].sort(() => Math.random() - 0.5);
+    pts.forEach(p => p.carrier = false);
+    nodes.forEach((n, i) => { const p = pool[i % pool.length]; n.sx = p.x; n.sy = p.y; p.carrier = true; });
+    brain = { pts, edges: bedges, outline, pulses: [] };
+    loader.style.setProperty("--ly", (cy + s * 0.98 + 34) + "px");
+  }
+
+  function drawBrain(el, dt, fade, skipCarriers) {
+    const { pts, edges: be, outline } = brain;
+    const vis = p => Math.max(0, Math.min(1, (el - p.at) / 260));
+    const hold = Math.max(0, Math.min(1, (el - BUILD) / 400));
+    const ok = Math.min(1, el / (BUILD * 0.95));
+    ctx.lineWidth = 1.5; ctx.strokeStyle = `rgba(124,212,253,${(0.45 + 0.3 * hold) * fade})`;
+    outline.forEach(({ pts: arr, a }) => {
+      const n = Math.floor(arr.length * ok); if (n < 2) return;
+      ctx.globalAlpha = a;
+      ctx.beginPath(); ctx.moveTo(arr[0][0], arr[0][1]);
+      for (let i = 1; i < n; i++) ctx.lineTo(arr[i][0], arr[i][1]);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+    for (const e of be) {
+      const v = Math.min(vis(e.a), vis(e.b)); if (!v) continue;
+      ctx.strokeStyle = `rgba(90,160,245,${(0.16 + e.w * 0.18 + hold * 0.12) * v * fade})`; ctx.lineWidth = 0.8 + e.w * 0.5;
+      ctx.beginPath(); ctx.moveTo(e.a.x, e.a.y); ctx.lineTo(e.b.x, e.b.y); ctx.stroke();
+    }
+    // signals racing through the brain once it has mostly formed
+    if (el > BUILD * 0.55 && fade > 0.2) {
+      for (let i = 0; i < 3; i++) if (Math.random() < dt * 14) {
+        const e = be[(Math.random() * be.length) | 0];
+        if (vis(e.a) === 1 && vis(e.b) === 1) brain.pulses.push({ e, t: 0, dir: Math.random() < .5 });
+      }
+    }
+    for (let i = brain.pulses.length - 1; i >= 0; i--) {
+      const p = brain.pulses[i]; p.t += dt * 2.6;
+      if (p.t >= 1) { (p.dir ? p.e.b : p.e.a).flash = 1; brain.pulses.splice(i, 1); continue; }
+      const a = p.dir ? p.e.a : p.e.b, b = p.dir ? p.e.b : p.e.a;
+      const x = a.x + (b.x - a.x) * p.t, y = a.y + (b.y - a.y) * p.t;
+      ctx.fillStyle = `rgba(200,236,255,${0.95 * fade})`; ctx.beginPath(); ctx.arc(x, y, 1.8, 0, 6.283); ctx.fill();
+    }
+    for (const p of pts) {
+      if (skipCarriers && p.carrier) continue;
+      const v = vis(p); if (!v) continue;
+      p.flash = Math.max(0, (p.flash || 0) - dt * 2.5);
+      if (p.flash > 0.05) {
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 16);
+        g.addColorStop(0, `rgba(61,155,255,${0.5 * p.flash * fade})`); g.addColorStop(1, "rgba(61,155,255,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, 16, 0, 6.283); ctx.fill();
+      }
+      const pop = v < 1 ? 1 + (1 - v) * 1.5 : 1;
+      ctx.fillStyle = `rgba(150,215,255,${(0.75 + 0.25 * p.flash) * v * fade})`;
+      ctx.beginPath(); ctx.arc(p.x, p.y, (p.carrier ? 2.6 : 2) * pop, 0, 6.283); ctx.fill();
+    }
+    pct.textContent = Math.round(Math.min(1, el / BUILD) * 100) + "%";
+  }
+
+  const fireFrom = node => { edges.filter(e => e.a === node).forEach(e => pulses.push({ e, t: 0, v: 0.9 + Math.random() * 0.4 })); node.glow = 1; };
+  function spawn() {
+    const starts = edges.filter(e => e.l === 0), e = starts[(Math.random() * starts.length) | 0];
+    if (e) pulses.push({ e, t: 0, v: 0.5 + Math.random() * 0.5 });
+  }
+  const skip = () => { if (phase === "brain") t0 = performance.now() - (BUILD + HOLD); };
+  loader.addEventListener("click", skip);
+  addEventListener("keydown", e => { if (phase === "brain" && e.key !== "Tab") skip(); });
+  addEventListener("click", e => {
+    if (phase !== "live") return;
+    if (e.target.closest("a, button, .project, .card-model, .role, .pub, .skillset, .contact, .modal, input, .portrait")) return;
+    let best = null, bd = Infinity;
+    layers.flat().forEach(n => { const d = Math.hypot(n.x - e.clientX, n.y - e.clientY); if (d < bd) { bd = d; best = n; } });
+    if (best) { fireFrom(best); layers[0].forEach(fireFrom); }
+  });
+
+  function draw(time) {
+    const dt = Math.min((time - last) / 1000 || 0, 0.05); last = time;
+    ctx.clearRect(0, 0, W, H);
+    let k = 1;
+    if (phase !== "live") {
+      const el = time - t0;
+      if (phase === "brain") {
+        drawBrain(el, dt, 1, false);
+        if (el >= BUILD + HOLD) { phase = "morph"; root.classList.add("loaded"); }
+        else { requestAnimationFrame(draw); return; }
+      }
+      k = ease(Math.max(0, Math.min(1, (el - BUILD - HOLD) / MORPH)));
+      drawBrain(el, dt, 1 - k, true);
+      if (k > 0.35) root.classList.add("ready");
+      if (k >= 1) {
+        phase = "live"; brain = null;
+        root.classList.remove("loading", "loaded"); root.classList.add("ready");
+      }
+    }
+    const morphing = k < 1, live = !morphing;
+    const R = 170;
+    for (const L of layers) for (const n of L) {
+      const dx = mouse.x - n.bx, dy = mouse.y - n.by, d = Math.hypot(dx, dy);
+      const pull = live && mouse.active && d < R ? (1 - d / R) : 0;
+      n.hover += (pull - n.hover) * 0.12;
+      const tx = n.bx + Math.sin(time / 2600 + n.ph) * 6 + dx * n.hover * 0.12;
+      const ty = n.by + Math.cos(time / 3100 + n.ph) * 8 + dy * n.hover * 0.12;
+      n.x = morphing ? n.sx + (tx - n.sx) * k : tx;
+      n.y = morphing ? n.sy + (ty - n.sy) * k : ty;
+      n.glow = Math.max(0, n.glow - dt * 1.4);
+    }
+    for (const e of edges) {
+      const h = Math.max(e.a.hover, e.b.hover);
+      ctx.strokeStyle = `rgba(${90 + h * 34},${150 + h * 62},${240 + h * 13},${(0.05 + e.w * 0.09 + h * 0.35) * k})`;
+      ctx.lineWidth = 0.6 + e.w * 0.6 + h;
+      ctx.beginPath(); ctx.moveTo(e.a.x, e.a.y); ctx.lineTo(e.b.x, e.b.y); ctx.stroke();
+    }
+    if (live && mouse.active && finePointer) {
+      for (const L of layers) for (const n of L) if (n.hover > 0.05) {
+        ctx.strokeStyle = `rgba(124,212,253,${n.hover * 0.5})`; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(mouse.x, mouse.y); ctx.lineTo(n.x, n.y); ctx.stroke();
+      }
+    }
+    if (!reduce && live) {
+      if (Math.random() < dt * 6 && pulses.length < 60) spawn();
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i]; p.t += dt * p.v * 1.1;
+        const { a, b } = p.e;
+        if (p.t >= 1) {
+          b.glow = 1; pulses.splice(i, 1);
+          const next = edges.filter(e => e.a === b);
+          if (next.length && pulses.length < 120) {
+            const n = 1 + (Math.random() < 0.35 ? 1 : 0);
+            for (let j = 0; j < n; j++) pulses.push({ e: next[(Math.random() * next.length) | 0], t: 0, v: p.v });
+          }
+          continue;
+        }
+        const x = a.x + (b.x - a.x) * p.t, y = a.y + (b.y - a.y) * p.t, q = Math.max(0, p.t - 0.12);
+        const tx = a.x + (b.x - a.x) * q, ty = a.y + (b.y - a.y) * q;
+        const g = ctx.createLinearGradient(tx, ty, x, y);
+        g.addColorStop(0, "rgba(124,212,253,0)"); g.addColorStop(1, "rgba(124,212,253,0.9)");
+        ctx.strokeStyle = g; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
+        ctx.fillStyle = "rgba(190,232,255,0.95)"; ctx.beginPath(); ctx.arc(x, y, 1.8, 0, 6.283); ctx.fill();
+      }
+    }
+    for (const L of layers) for (const n of L) {
+      const lit = Math.max(n.glow, n.hover);
+      const r = (2.6 + 0.6 * k) + lit * 3;
+      if (lit > 0.02) {
+        const halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 24);
+        halo.addColorStop(0, `rgba(61,155,255,${0.45 * lit})`); halo.addColorStop(1, "rgba(61,155,255,0)");
+        ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(n.x, n.y, 24, 0, 6.283); ctx.fill();
+      }
+      ctx.fillStyle = morphing ? `rgba(150,215,255,${1 - k})` : "#0a1530";
+      if (morphing) { ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 6.283); ctx.fill(); ctx.fillStyle = `rgba(10,21,48,${k})`; }
+      ctx.strokeStyle = `rgba(124,212,253,${(0.45 + lit * 0.5) * k + (morphing ? 0 : 0)})`; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, 6.283); ctx.fill(); ctx.stroke();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  // Only regenerate the network on a real layout change; small changes (scrollbar, mobile URL bar) just rescale it
+  let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => {
+    const nw = innerWidth, nh = innerHeight;
+    if (phase === "live" && Math.abs(nw - W) < 80 && Math.abs(nh - H) < 220 && (nw < 600) === (W < 600)) {
+      const sx = nw / W, sy = nh / H, dpr = Math.min(devicePixelRatio || 1, 2);
+      for (const L of layers) for (const n of L) { n.bx *= sx; n.by *= sy; }
+      W = nw; H = nh; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    } else build();
+    if (reduce) draw(0);
+  }, 150); });
+  build();
+  if (reduce) draw(0); else requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
